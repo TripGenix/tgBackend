@@ -1,0 +1,10 @@
+ALTER TABLE `drivers`
+ADD COLUMN `driver_image` VARCHAR(500) NOT NULL AFTER `status`,
+CHANGE COLUMN `driver_id` `driver_id` INT NOT NULL AUTO_INCREMENT ,
+CHANGE COLUMN `licen_image_url` `licen_pdf_url` VARCHAR(500) NOT NULL ;
+
+ALTER TABLE `drivers`
+ADD COLUMN `created_at` DATETIME NOT NULL AFTER `driver_image`;
+
+ALTER TABLE `drivers`
+ADD COLUMN `is_delete` TINYINT NOT NULL DEFAULT 0 AFTER `created_at`;
