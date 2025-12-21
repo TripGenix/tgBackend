@@ -21,6 +21,7 @@
     <module>GoogleService</module>
     <module>TouristService</module>
       <module>AdminManagementService</module>
+      <module>PackageService</module>
   </modules>
   <build>
     <plugins>
