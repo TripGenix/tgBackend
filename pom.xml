@@ -22,6 +22,7 @@
     <module>TouristService</module>
       <module>AdminManagementService</module>
       <module>PackageService</module>
+      <module>BookingService</module>
   </modules>
   <build>
     <plugins>
