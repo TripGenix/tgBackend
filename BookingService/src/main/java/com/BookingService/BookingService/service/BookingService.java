@@ -227,6 +227,33 @@ public class BookingService {
     }
 
 
+    public BookingSystemResponseDto getBookingById(Integer bookingId) {
 
+        //Fetch booking
+        Booking booking = bookingRepository.findById(Long.valueOf(bookingId))
+                .orElseThrow(() ->
+                        new RuntimeException("Booking not found with ID: " + bookingId)
+                );
+
+        //  Map Booking → DTO
+        BookingSystemResponseDto dto =
+                modelMapper.map(booking, BookingSystemResponseDto.class);
+
+        // 3️⃣ FIX: manually map fields with name mismatch
+        dto.setCreatedAt(booking.getDateCreated());
+
+        // 4️⃣ Route (derived from route table)
+        dto.setRoute(
+                routeRepository.findWayPointsByTripId(booking.getTripId())
+        );
+
+        // 5️⃣ Trip dates (derived from trip table)
+        tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+            dto.setStartDate(trip.getStartDateTime());
+            dto.setEndDate(trip.getEndDateTime());
+        });
+
+        return dto;
+    }
 
 }

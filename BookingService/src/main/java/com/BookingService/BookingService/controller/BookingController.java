@@ -31,29 +31,11 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
-    @GetMapping("get_passenger_confirm_bookings")
-    public String passengerConfirmBooking() {
-        return "Booking Service is running";
-    }
-
-    @GetMapping("get_driver_pending_bookings")
-    public String driverPendingBooking() {
-        return "Booking Service is running";
-    }
-
-    @GetMapping("get_ongoing_bookings")
-    public String ongoingBooking() {
-        return "Booking Service is running";
-    }
-
-    @GetMapping("get_finished_bookings")
-    public String finishedBooking() {
-        return "Booking Service is running";
-    }
-
-    @GetMapping("get_cancelled_bookings")
-    public String cancelledBooking() {
-        return "Booking Service is running";
+    @GetMapping("get_booking_by_id/{bookingId}")
+    @ResponseBody
+    public ResponseEntity<BookingSystemResponseDto> getBookingById(@PathVariable int bookingId) {
+        BookingSystemResponseDto  bookings = bookingService.getBookingById(bookingId);
+        return ResponseEntity.ok(bookings);
     }
 
     @PostMapping("/saveBooking")
