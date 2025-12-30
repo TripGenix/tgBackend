@@ -23,6 +23,8 @@ public class TourPackage {
     private String vehicle;
     private String guide;
     private boolean popular;
+    private String imageUrl;
+
 
     @ElementCollection
     private List<String> destinations;

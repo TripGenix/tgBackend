@@ -14,6 +14,8 @@ public class TourPackageDto {
     private String vehicle;
     private String guide;
     private boolean popular;
+    private String imageUrl;
+
     private List<String> destinations;
     private List<String> features;
     private List<String> hotels;
