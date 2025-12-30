@@ -76,4 +76,5 @@ public class TourPackageService {
         // 25% discount for more than one passenger
         return pricePerPerson * passengers * 0.75;
     }
+
 }
