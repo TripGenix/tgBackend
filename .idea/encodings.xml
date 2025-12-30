@@ -5,6 +5,7 @@
     <file url="file://$PROJECT_DIR$/BookingService/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/DriverManagement/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/DriverManagement/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/EmailService/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/GoogleService/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/GoogleService/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/PackageService/src/main/java" charset="UTF-8" />
@@ -12,6 +13,7 @@
     <file url="file://$PROJECT_DIR$/TouristService/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/VehicleManagement/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/VehicleManagement/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/api-gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>
