@@ -1,10 +1,10 @@
-package com.tripgenix.AuthService;
+package com.EmailService.EmailService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AuthServiceApplicationTests {
+class EmailServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

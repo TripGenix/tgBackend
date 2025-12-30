@@ -2,12 +2,15 @@ package com.BookingService.BookingService.service;
 
 import com.BookingService.BookingService.dto.BookingRequestDto;
 import com.BookingService.BookingService.dto.BookingResponseDto;
+import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseDto;
 import com.BookingService.BookingService.model.Booking;
 import com.BookingService.BookingService.model.Route;
 import com.BookingService.BookingService.model.Trip;
 import com.BookingService.BookingService.repository.BookingRepository;
 import com.BookingService.BookingService.repository.RouteRepository;
 import com.BookingService.BookingService.repository.TripRepository;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 public class BookingService {
@@ -28,6 +32,10 @@ public class BookingService {
 
     @Autowired
     private RouteRepository routeRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
 
     @Transactional
     public BookingResponseDto createBooking(BookingRequestDto dto) {
@@ -117,13 +125,20 @@ public class BookingService {
 
         //Response
 
+        List<String> routeList = dto.getTripDetails().getDestinations();
+
         BookingResponseDto response = new BookingResponseDto();
-        response.setReferenceId(referenceId);
+
         response.setBookingId(savedBooking.getBookingId());
         response.setTripId(savedTrip.getTripId());
+        response.setCustomerName(savedBooking.getBookerName());
+        response.setRoute(routeList);
+        response.setStartDate(savedTrip.getStartDateTime());
+        response.setEndDate(savedTrip.getEndDateTime());
         response.setTouristId(savedBooking.getTouristId());
         response.setStatus(savedBooking.getStatus());
         response.setCreatedAt(savedBooking.getDateCreated());
+        response.setReferenceId(savedBooking.getReferenceId());
 
         return response;
     }
@@ -136,4 +151,109 @@ public class BookingService {
 
         return "TG-CP-" + date + "-" + bookingId;
     }
+
+
+    public List<BookingSystemResponseDto> getNewBookings() {
+
+        // Fetch NEW bookings
+        List<Booking> bookings = bookingRepository.findByStatus("NEW");
+
+        //Map entity list → DTO list
+        List<BookingSystemResponseDto> dtoList =
+                modelMapper.map(
+                        bookings,
+                        new TypeToken<List<BookingSystemResponseDto>>() {}.getType()
+                );
+
+        //  Enrich DTOs with derived & missing fields
+        for (int i = 0; i < bookings.size(); i++) {
+
+            Booking booking = bookings.get(i);
+            BookingSystemResponseDto dto = dtoList.get(i);
+
+            // FIX: manually map createdAt
+            dto.setCreatedAt(booking.getDateCreated());
+
+            //Route
+            dto.setRoute(
+                    routeRepository.findWayPointsByTripId(booking.getTripId())
+            );
+
+            // Trip dates
+            tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+                dto.setStartDate(trip.getStartDateTime());
+                dto.setEndDate(trip.getEndDateTime());
+            });
+        }
+
+        return dtoList;
+    }
+
+
+    public List<BookingSystemResponseDto> getAllBookings() {
+
+        //Fetch all bookings
+        List<Booking> bookings = bookingRepository.findAll();
+
+        //  Map entity list → DTO list
+        List<BookingSystemResponseDto> dtoList =
+                modelMapper.map(
+                        bookings,
+                        new TypeToken<List<BookingSystemResponseDto>>() {}.getType()
+                );
+
+        // Enrich DTOs with missing / derived fields
+        for (int i = 0; i < bookings.size(); i++) {
+
+            Booking booking = bookings.get(i);
+            BookingSystemResponseDto dto = dtoList.get(i);
+
+            //  manually map createdAt (name mismatch)
+            dto.setCreatedAt(booking.getDateCreated());
+
+            // Route (derived)
+            dto.setRoute(
+                    routeRepository.findWayPointsByTripId(booking.getTripId())
+            );
+
+            //  Trip dates (derived)
+            tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+                dto.setStartDate(trip.getStartDateTime());
+                dto.setEndDate(trip.getEndDateTime());
+            });
+        }
+
+        return dtoList;
+    }
+
+
+    public BookingSystemResponseDto getBookingById(Integer bookingId) {
+
+        //Fetch booking
+        Booking booking = bookingRepository.findById(Long.valueOf(bookingId))
+                .orElseThrow(() ->
+                        new RuntimeException("Booking not found with ID: " + bookingId)
+                );
+
+        //  Map Booking → DTO
+        BookingSystemResponseDto dto =
+                modelMapper.map(booking, BookingSystemResponseDto.class);
+
+        // 3️⃣ FIX: manually map fields with name mismatch
+        dto.setCreatedAt(booking.getDateCreated());
+
+        // 4️⃣ Route (derived from route table)
+        dto.setRoute(
+                routeRepository.findWayPointsByTripId(booking.getTripId())
+        );
+
+        // 5️⃣ Trip dates (derived from trip table)
+        tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+            dto.setStartDate(trip.getStartDateTime());
+            dto.setEndDate(trip.getEndDateTime());
+        });
+
+        return dto;
+    }
+
 }
