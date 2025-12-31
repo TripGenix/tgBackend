@@ -9,11 +9,13 @@ import com.BookingService.BookingService.model.Trip;
 import com.BookingService.BookingService.repository.BookingRepository;
 import com.BookingService.BookingService.repository.RouteRepository;
 import com.BookingService.BookingService.repository.TripRepository;
+import com.EmailService.EmailService.Dto.EmailDetailsDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -35,6 +37,12 @@ public class BookingService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    private final WebClient webClient;
+
+    public BookingService(WebClient webClient) {
+        this.webClient = webClient;
+    }
 
 
     @Transactional
@@ -255,5 +263,39 @@ public class BookingService {
 
         return dto;
     }
+
+    public void sendEmail(Long bookingId,EmailDetailsDto emailDetailsDto) {
+
+        webClient.post()
+                .uri("http://localhost:8088/email/api/v1/send")
+                .bodyValue(emailDetailsDto)
+                .retrieve()
+                .bodyToMono(String.class)
+                .doOnSuccess(response -> {
+                    System.out.println("✅ Email sent: " + response);
+
+                    updateEmailStatus(bookingId,true);
+                })
+                .doOnError(error -> {
+                    System.err.println("❌ Email failed: " + error.getMessage());
+                    updateEmailStatus(bookingId,false);
+
+                })
+                .subscribe();
+
+
+    }
+
+    @Transactional
+    public void updateEmailStatus(Long bookingId, boolean status) {
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        booking.setSendConfirmEmail(status);
+
+        bookingRepository.save(booking);
+    }
+
 
 }
