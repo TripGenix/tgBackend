@@ -2,8 +2,10 @@ package com.BookingService.BookingService.controller;
 
 import com.BookingService.BookingService.dto.BookingRequestDto;
 import com.BookingService.BookingService.dto.BookingResponseDto;
+import com.BookingService.BookingService.dto.ConfirmBookingEmailRequest;
 import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseDto;
 import com.BookingService.BookingService.service.BookingService;
+import com.EmailService.EmailService.Dto.EmailDetailsDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,5 +47,13 @@ public class BookingController {
         BookingResponseDto booking = bookingService.createBooking(dto);
         return new ResponseEntity<>(booking, HttpStatus.CREATED);
     }
+
+    @PostMapping("/send_confirm_booking_email")
+    public ResponseEntity<String> confirmBooking(@RequestBody ConfirmBookingEmailRequest request) {
+        bookingService.sendEmail(request.getBookingId(), request.getEmail());
+        return ResponseEntity.ok("Email Send Successfully");
+
+    }
+
 
 }
