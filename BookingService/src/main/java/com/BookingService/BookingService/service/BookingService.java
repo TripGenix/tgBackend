@@ -1,7 +1,7 @@
 package com.BookingService.BookingService.service;
 
-import com.BookingService.BookingService.dto.BookingRequestDto;
-import com.BookingService.BookingService.dto.BookingResponseDto;
+import com.BookingService.BookingService.dto.*;
+import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseById;
 import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseDto;
 import com.BookingService.BookingService.model.Booking;
 import com.BookingService.BookingService.model.Route;
@@ -235,34 +235,95 @@ public class BookingService {
     }
 
 
-    public BookingSystemResponseDto getBookingById(Integer bookingId) {
+    public BookingSystemResponseById getBookingById(Integer bookingId) {
 
-        //Fetch booking
         Booking booking = bookingRepository.findById(Long.valueOf(bookingId))
                 .orElseThrow(() ->
                         new RuntimeException("Booking not found with ID: " + bookingId)
                 );
 
-        //  Map Booking → DTO
-        BookingSystemResponseDto dto =
-                modelMapper.map(booking, BookingSystemResponseDto.class);
+        BookingSystemResponseById response = new BookingSystemResponseById();
 
-        // 3️⃣ FIX: manually map fields with name mismatch
-        dto.setCreatedAt(booking.getDateCreated());
+        response.setReferenceId(booking.getReferenceId());
+        /* ================= USER ================= */
+        UserDto userDto = new UserDto();
+        userDto.setUserId(booking.getTouristId());
+        response.setUser(userDto);
 
-        // 4️⃣ Route (derived from route table)
-        dto.setRoute(
-                routeRepository.findWayPointsByTripId(booking.getTripId())
-        );
+        /* ================= BOOKING DETAILS ================= */
+        BookingDetailsDto bookingDetails = new BookingDetailsDto();
+        bookingDetails.setNameOfBooker(booking.getBookerName());
+        bookingDetails.setBookerEmail(booking.getBookerEmail());
+        bookingDetails.setBookerPhone(booking.getBookerPhone());
+        bookingDetails.setPassportNumber(booking.getPassportNumber());
 
-        // 5️⃣ Trip dates (derived from trip table)
-        tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
-            dto.setStartDate(trip.getStartDateTime());
-            dto.setEndDate(trip.getEndDateTime());
-        });
+        bookingDetails.setArrivalDateTime(booking.getArrivalDateTime());
+        bookingDetails.setDepartureDateTime(booking.getDepartureDateTime());
+        bookingDetails.setFlightNumber(booking.getFlightNumber());
+        bookingDetails.setDepartureAirport(booking.getDepartureAirport());
 
-        return dto;
+        PassengerDto passengers = new PassengerDto();
+        passengers.setAdults(booking.getAdults());
+        passengers.setChildren(booking.getChildren());
+        passengers.setBabies(booking.getBabies());
+
+        bookingDetails.setPassengers(passengers);
+        response.setBookingDetails(bookingDetails);
+
+        /* ================= TRIP DETAILS ================= */
+        Trip trip = tripRepository.findById(booking.getTripId())
+                .orElseThrow(() ->
+                        new RuntimeException("Trip not found for booking")
+                );
+
+        TripDetailsDto tripDetails = new TripDetailsDto();
+        tripDetails.setStartDate(trip.getStartDateTime().toLocalDate());
+        tripDetails.setEndDate(trip.getEndDateTime().toLocalDate());
+        tripDetails.setStartLocation(trip.getStartLocation());
+        tripDetails.setEndLocation(trip.getEndLocation());
+
+        // destinations
+        List<String> destinations =
+                routeRepository.findWayPointsByTripId(trip.getTripId());
+        tripDetails.setDestinations(destinations);
+
+        response.setTripDetails(tripDetails);
+
+        /* ================= ROUTE DETAILS ================= */
+        RouteDetailsDto routeDetails = new RouteDetailsDto();
+        routeDetails.setDistance(trip.getDistance());
+        routeDetails.setDuration(trip.getDuration());
+        routeDetails.setBookingPrice(trip.getEstimatedCost().doubleValue());
+
+        response.setRouteDetails(routeDetails);
+
+        /* ================= RESOURCES ================= */
+        ResourcesDto resources = new ResourcesDto();
+
+        if (booking.getVehicleId() != null) {
+            VehicleDto vehicleDto = new VehicleDto();
+            vehicleDto.setVehicleId(booking.getVehicleId().longValue());
+            resources.setVehicle(vehicleDto);
+        }
+
+        if (booking.getDriverId() != null) {
+            DriverDto driverDto = new DriverDto();
+            driverDto.setDriverId(booking.getDriverId().longValue());
+            resources.setDriver(driverDto);
+        }
+
+        response.setResources(resources);
+
+        /* ================= METADATA ================= */
+        MetadataDto metadata = new MetadataDto();
+        metadata.setPackageId(booking.getPackageId());
+        metadata.setCreatedAt(booking.getDateCreated());
+
+        response.setMetadata(metadata);
+
+        return response;
     }
+
 
     public void sendEmail(Long bookingId,EmailDetailsDto emailDetailsDto) {
 

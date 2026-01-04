@@ -3,6 +3,7 @@ package com.BookingService.BookingService.controller;
 import com.BookingService.BookingService.dto.BookingRequestDto;
 import com.BookingService.BookingService.dto.BookingResponseDto;
 import com.BookingService.BookingService.dto.ConfirmBookingEmailRequest;
+import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseById;
 import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseDto;
 import com.BookingService.BookingService.service.BookingService;
 import com.EmailService.EmailService.Dto.EmailDetailsDto;
@@ -35,8 +36,8 @@ public class BookingController {
 
     @GetMapping("get_booking_by_id/{bookingId}")
     @ResponseBody
-    public ResponseEntity<BookingSystemResponseDto> getBookingById(@PathVariable int bookingId) {
-        BookingSystemResponseDto  bookings = bookingService.getBookingById(bookingId);
+    public ResponseEntity<BookingSystemResponseById> getBookingById(@PathVariable int bookingId) {
+        BookingSystemResponseById  bookings = bookingService.getBookingById(bookingId);
         return ResponseEntity.ok(bookings);
     }
 
