@@ -2,6 +2,7 @@ package com.BookingService.BookingService.service;
 
 import com.BookingService.BookingService.dto.BookingRequestDto;
 import com.BookingService.BookingService.dto.BookingResponseDto;
+import com.BookingService.BookingService.dto.EmailDetailsDto;
 import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseDto;
 import com.BookingService.BookingService.model.Booking;
 import com.BookingService.BookingService.model.Route;
@@ -9,7 +10,6 @@ import com.BookingService.BookingService.model.Trip;
 import com.BookingService.BookingService.repository.BookingRepository;
 import com.BookingService.BookingService.repository.RouteRepository;
 import com.BookingService.BookingService.repository.TripRepository;
-import com.EmailService.EmailService.Dto.EmailDetailsDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -264,7 +264,7 @@ public class BookingService {
         return dto;
     }
 
-    public void sendEmail(Long bookingId,EmailDetailsDto emailDetailsDto) {
+    public void sendEmail(Long bookingId, EmailDetailsDto emailDetailsDto) {
 
         webClient.post()
                 .uri("http://localhost:8088/email/api/v1/send")

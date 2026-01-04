@@ -5,7 +5,6 @@ import com.BookingService.BookingService.dto.BookingResponseDto;
 import com.BookingService.BookingService.dto.ConfirmBookingEmailRequest;
 import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseDto;
 import com.BookingService.BookingService.service.BookingService;
-import com.EmailService.EmailService.Dto.EmailDetailsDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
