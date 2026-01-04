@@ -21,4 +21,12 @@ public class VehicleDto {
     private String status;
     private LocalDateTime createdAt;
     private String vehicleName;
+    private String location;
+    private Integer doorCount;
+    private Double power;
+    private Double topSpeed;
+    private Double acceleration;
+    private String mainImage;
+    private Double latitude;
+    private Double longitude;
 }

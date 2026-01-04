@@ -24,6 +24,8 @@
       <module>PackageService</module>
       <module>BookingService</module>
       <module>EmailService</module>
+
+    <module>HotelManagement</module>
   </modules>
   <build>
     <plugins>

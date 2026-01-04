@@ -20,6 +20,14 @@ public class WebVehicleResponse {
     private BigDecimal bookingPrice;
     private String status;
     private String vehicleName;
+    private Double latitude;
+    private Double longitude;
     private List<String> vehicleImages;
+    private String location;
+    private Integer doorCount;
+    private Double power;
+    private Double topSpeed;
+    private Double acceleration;
+    private String mainImage;
 
 }

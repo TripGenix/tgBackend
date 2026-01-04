@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -20,37 +19,49 @@ public class Vehicle {
     @Column(name = "vehicle_id")
     private int vehicleId;
 
-
+    // ... existing fields ...
     @Column(name = "number_plate")
     private String numberPlate;
     private Integer type;
     private String description;
     @Column(name = "passenger_count")
     private Integer passengerCount;
-
     @Column(name = "cost_per_km")
     private BigDecimal costPerKm;
     @Column(name = "booking_price")
     private BigDecimal bookingPrice;
-
     private String status;
-
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)
     private LocalDateTime createdAt;
-
     @Column(name = "is_delete")
     private Boolean isDelete = false;
-
     @Column(name="vehicle_name")
     private String vehicleName;
-
     @Column(name="document_url")
     private String documentUrl;
+    @Column(name = "location")
+    private String location;
 
-    // FK to owner table
+    // 🟢 NEW: Location Coordinates
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
+    @Column(name = "door_count")
+    private Integer doorCount;
+    @Column(name = "power")
+    private Double power;
+    @Column(name = "top_speed")
+    private Double topSpeed;
+    @Column(name = "acceleration")
+    private Double acceleration;
+    @Column(name = "main_image")
+    private String mainImage;
+
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private Owner owner;
-
 }
