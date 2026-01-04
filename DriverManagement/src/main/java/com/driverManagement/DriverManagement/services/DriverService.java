@@ -27,33 +27,35 @@ public class DriverService {
     @Transactional
     public DriverResponseDto saveDriver(DriverSaveDto dto) {
 
-        // 1. Map DTO → Entity
+        // 1. Map DTO → Entity & Save
         Driver driver = modelMapper.map(dto, Driver.class);
         driver.setIsDelete(false);
-
-        // 2. Save Driver
         Driver savedDriver = driverRepository.save(driver);
-
         int driverId = savedDriver.getDriverId();
 
-        // 3. Save allocated vehicles by vehicle number
+        // 2. Insert Allocations (Vehicles)
         if (dto.getSelectedVehicleByNumber() != null) {
             for (Integer vehicleId : dto.getSelectedVehicleByNumber()) {
                 driverRepository.insertDriverAllocatedVehicle(driverId, vehicleId);
             }
         }
 
-        // 4. Save allocated vehicles by category
+        // 3. Insert Allocations (Categories)
         if (dto.getSelectedVehicleCategories() != null) {
             for (Integer categoryId : dto.getSelectedVehicleCategories()) {
                 driverRepository.insertDriverAllocatedVehicleCategory(driverId, categoryId);
             }
         }
 
-        // 5. Return Response DTO
-        return modelMapper.map(savedDriver, DriverResponseDto.class);
-    }
+        // 4. Create Response & 🔴 POPULATE THE MISSING LISTS
+        DriverResponseDto response = modelMapper.map(savedDriver, DriverResponseDto.class);
 
+        // Fix: Set the lists manually from the input DTO (since we just saved them)
+        response.setSelectedVehicleByNumber(dto.getSelectedVehicleByNumber());
+        response.setSelectedVehicleCategories(dto.getSelectedVehicleCategories());
+
+        return response;
+    }
     @Transactional
     public DriverResponseDto updateDriver(int driverId, DriverUpdateDto dto) {
 

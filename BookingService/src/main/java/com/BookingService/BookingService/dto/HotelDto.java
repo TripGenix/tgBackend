@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResourcesDto {
-    private VehicleDto vehicle;
-    private DriverDto driver;
-    private GuideDto guide;
-    private HotelDto hotel;
+public class HotelDto {
+    private Long hotelId;
+    private String hotelName;
+    private String location;
 }

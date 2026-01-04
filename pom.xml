@@ -23,6 +23,7 @@
       <module>AdminManagementService</module>
       <module>PackageService</module>
       <module>BookingService</module>
+    <module>HotelManagement</module>
   </modules>
   <build>
     <plugins>

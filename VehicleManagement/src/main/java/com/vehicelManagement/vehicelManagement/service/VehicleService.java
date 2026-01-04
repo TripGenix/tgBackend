@@ -80,7 +80,14 @@ public class VehicleService {
         vehicle.setIsDelete(false);
         vehicle.setOwner(owner);
         vehicle.setDocumentUrl(dto.getDocumentUrl());
-
+        vehicle.setLocation(dto.getLocation());
+        vehicle.setDoorCount(dto.getDoorCount());
+        vehicle.setPower(dto.getPower());
+        vehicle.setTopSpeed(dto.getTopSpeed());
+        vehicle.setAcceleration(dto.getAcceleration());
+        vehicle.setMainImage(dto.getMainImage());
+        vehicle.setLatitude(dto.getLatitude());
+        vehicle.setLongitude(dto.getLongitude());
         vehicle = vehicleRepository.save(vehicle);
         System.out.println(vehicle);
 
@@ -139,6 +146,7 @@ public class VehicleService {
         vehicle.setVehicleName(dto.getVehicleName());
         vehicle.setNumberPlate(dto.getVehicleNumber());
         vehicle.setType(dto.getCategory());
+
         vehicle.setDescription(dto.getDescription());
         vehicle.setPassengerCount(dto.getPassengerCount());
         vehicle.setCostPerKm(BigDecimal.valueOf(dto.getCostPerKm()));
@@ -149,7 +157,16 @@ public class VehicleService {
         if (dto.getDocumentUrl() != null) {
             vehicle.setDocumentUrl(dto.getDocumentUrl());
         }
-
+        if (dto.getLatitude() != null) vehicle.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null) vehicle.setLongitude(dto.getLongitude());
+        if (dto.getLocation() != null) vehicle.setLocation(dto.getLocation());
+        if (dto.getLatitude() != null) vehicle.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null) vehicle.setLongitude(dto.getLongitude());
+        if (dto.getDoorCount() != null) vehicle.setDoorCount(dto.getDoorCount());
+        if (dto.getPower() != null) vehicle.setPower(dto.getPower());
+        if (dto.getTopSpeed() != null) vehicle.setTopSpeed(dto.getTopSpeed());
+        if (dto.getAcceleration() != null) vehicle.setAcceleration(dto.getAcceleration());
+        if (dto.getMainImage() != null) vehicle.setMainImage(dto.getMainImage());
         // 4️⃣ Update images (OPTION 2 – delete by vehicleId)
         if (dto.getVehicleImages() != null && !dto.getVehicleImages().isEmpty()) {
 
@@ -165,10 +182,8 @@ public class VehicleService {
             }
         }
 
-        // 5️⃣ Save vehicle
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
 
-        // 6️⃣ Return DTO
         return modelMapper.map(updatedVehicle, VehicleDto.class);
     }
 
