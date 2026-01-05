@@ -48,7 +48,6 @@ public class BookingService {
     public BookingResponseDto createBooking(BookingRequestDto dto) {
 
 
-        // Save Trip
         Trip trip = new Trip();
         trip.setStartDateTime(dto.getTripDetails().getStartDate().atStartOfDay());
         trip.setEndDateTime(dto.getTripDetails().getEndDate().atStartOfDay());
@@ -77,7 +76,19 @@ public class BookingService {
         booking.setTripId(savedTrip.getTripId());
         booking.setTouristId(dto.getUser().getUserId());
         booking.setPackageId(dto.getMetadata().getPackageId());
+        if (dto.getResources().getVehicle() != null) {
+            booking.setVehicleId(dto.getResources().getVehicle().getVehicleId().intValue());
+        }
 
+        // Handle Driver (Can be null)
+        if (dto.getResources().getDriver() != null) {
+            booking.setDriverId(dto.getResources().getDriver().getDriverId().intValue());
+        }
+
+        // Handle Hotel (Can be null) - 🔴 NEW LOGIC
+        if (dto.getResources().getHotel() != null) {
+            booking.setHotelId(dto.getResources().getHotel().getHotelId().intValue());
+        }
         // Booker info
         booking.setBookerName(dto.getBookingDetails().getNameOfBooker());
         booking.setBookerEmail(dto.getBookingDetails().getBookerEmail());
