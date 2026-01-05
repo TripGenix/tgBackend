@@ -91,6 +91,7 @@ public class BookingService {
 //        if (dto.getResources().getHotel() != null) {
 //            booking.setHotelId(dto.getResources().getHotel().getHotelId().intValue());
 //        }
+
         // Booker info
         booking.setBookerName(dto.getBookingDetails().getNameOfBooker());
         booking.setBookerEmail(dto.getBookingDetails().getBookerEmail());

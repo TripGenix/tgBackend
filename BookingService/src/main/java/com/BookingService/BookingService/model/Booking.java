@@ -45,8 +45,10 @@ public class Booking {
 
     @Column(name = "driver_id")
     private Integer driverId;
+
 //    @Column(name = "hotel_id")
 //    private Integer hotelId;
+
     // =========================
     // Booker Details
     // =========================
