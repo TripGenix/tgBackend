@@ -26,4 +26,10 @@ public class CategoryService {
         List<VehicleCategory> categories = vehicleCategoryRepository.findAll();
         return modelMapper.map(categories, new TypeToken<List<VehicleCategoryDto>>() {}.getType());
     }
+    // Add this method if you haven't yet
+    public VehicleCategoryDto saveCategory(VehicleCategoryDto dto) {
+        VehicleCategory category = modelMapper.map(dto, VehicleCategory.class);
+        VehicleCategory savedCategory = vehicleCategoryRepository.save(category);
+        return modelMapper.map(savedCategory, VehicleCategoryDto.class);
+    }
 }

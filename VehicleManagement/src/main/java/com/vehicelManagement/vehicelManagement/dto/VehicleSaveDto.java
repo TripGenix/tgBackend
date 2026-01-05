@@ -21,7 +21,8 @@ public class VehicleSaveDto {
     private BigDecimal bookingPrice;
     private String status;
     private String description;
-
+    private Double latitude;
+    private Double longitude;
     // Owner Details
     private String ownerName;
     private String ownerId;
@@ -36,5 +37,11 @@ public class VehicleSaveDto {
     private List<String> vehicleImages;  // multiple URLs
     private String ownerImage;           // single image URL
     private String documentUrl;
+    private String location;
+    private Integer doorCount;
+    private Double power;
+    private Double topSpeed;
+    private Double acceleration;
+    private String mainImage;
 
 }

@@ -18,6 +18,8 @@ public class VehicleReciveDto {
     private String description;
     private Integer passengerCount;
     private BigDecimal costPerKm;
+    private Double latitude;
+    private Double longitude;
     private BigDecimal bookingPrice;
     private String status;
     private LocalDateTime createdAt;
@@ -25,4 +27,11 @@ public class VehicleReciveDto {
     private List<String> vehicleImages;
     private String documentUrl;
     private OwnerDto owner;
+
+    private String location;
+    private Integer doorCount;
+    private Double power;
+    private Double topSpeed;
+    private Double acceleration;
+    private String mainImage;
 }
