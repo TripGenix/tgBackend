@@ -9,10 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingSystemResponseById {
+    private String referenceId;
     private UserDto user;
     private BookingDetailsDto bookingDetails;
     private TripDetailsDto tripDetails;
     private RouteDetailsDto routeDetails;
     private ResourcesDto resources;
     private MetadataDto metadata;
+
 }

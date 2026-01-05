@@ -1,8 +1,7 @@
 package com.BookingService.BookingService.service;
 
-import com.BookingService.BookingService.dto.BookingRequestDto;
-import com.BookingService.BookingService.dto.BookingResponseDto;
-import com.BookingService.BookingService.dto.EmailDetailsDto;
+import com.BookingService.BookingService.dto.*;
+import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseById;
 import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseDto;
 import com.BookingService.BookingService.model.Booking;
 import com.BookingService.BookingService.model.Route;
@@ -235,33 +234,84 @@ public class BookingService {
     }
 
 
-    public BookingSystemResponseDto getBookingById(Integer bookingId) {
+    public BookingSystemResponseById getBookingById(Long bookingId) {
 
-        //Fetch booking
-        Booking booking = bookingRepository.findById(Long.valueOf(bookingId))
-                .orElseThrow(() ->
-                        new RuntimeException("Booking not found with ID: " + bookingId)
-                );
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        //  Map Booking → DTO
-        BookingSystemResponseDto dto =
-                modelMapper.map(booking, BookingSystemResponseDto.class);
+        Trip trip = tripRepository.findById(booking.getTripId())
+                .orElseThrow(() -> new RuntimeException("Trip not found"));
 
-        // 3️⃣ FIX: manually map fields with name mismatch
-        dto.setCreatedAt(booking.getDateCreated());
+        BookingSystemResponseById response = new BookingSystemResponseById();
 
-        // 4️⃣ Route (derived from route table)
-        dto.setRoute(
-                routeRepository.findWayPointsByTripId(booking.getTripId())
+        // Reference
+        response.setReferenceId(booking.getReferenceId());
+
+        // User
+        response.setUser(
+                new UserDto(
+                        booking.getTouristId(),
+                        "TOURIST"
+                )
         );
 
-        // 5️⃣ Trip dates (derived from trip table)
-        tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
-            dto.setStartDate(trip.getStartDateTime());
-            dto.setEndDate(trip.getEndDateTime());
-        });
+        // Booking details
+        response.setBookingDetails(
+                new BookingDetailsDto(
+                        booking.getBookerName(),
+                        booking.getPassportNumber(),
+                        booking.getBookerEmail(),
+                        booking.getBookerPhone(),
+                        booking.getArrivalDateTime(),
+                        booking.getDepartureDateTime(),
+                        booking.getFlightNumber(),
+                        booking.getDepartureAirport(),
+                        null // passengers (map if needed)
+                )
+        );
 
-        return dto;
+        // Trip details
+        response.setTripDetails(
+                new TripDetailsDto(
+                        trip.getStartLocation(),
+                        trip.getEndLocation(),
+                        trip.getStartDateTime().toLocalDate(),
+                        trip.getEndDateTime().toLocalDate(),
+                        booking.getVehicleId() != null,
+                        routeRepository.findWayPointsByTripId(trip.getTripId())
+                )
+        );
+
+        // Route details
+        response.setRouteDetails(
+                new RouteDetailsDto(
+                        trip.getDistance(),
+                        trip.getDuration(),
+                        null,
+                        null,
+                        trip.getEstimatedCost().doubleValue()
+                )
+        );
+
+        // Resources
+        response.setResources(
+                new ResourcesDto(
+                        null, // vehicle
+                        null, // driver
+                        null  // guide
+                )
+        );
+
+        // Metadata
+        response.setMetadata(
+                new MetadataDto(
+                        booking.getDateCreated(),
+                        "SYSTEM",
+                        booking.getPackageId()
+                )
+        );
+
+        return response;
     }
 
     public void sendEmail(Long bookingId, EmailDetailsDto emailDetailsDto) {
