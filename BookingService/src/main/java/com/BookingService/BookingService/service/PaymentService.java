@@ -1,5 +1,6 @@
 package com.BookingService.BookingService.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -9,8 +10,10 @@ import java.text.DecimalFormat;
 @Service
 public class PaymentService {
 
-    private static final String MERCHANT_ID = "1233436";      // SANDBOX
-    private static final String MERCHANT_SECRET = "MjIyNDY5NzY4NTIyMjc2NDczMTcyODMwMDY0NjgyMzU2MzQ5NzM2"; // SANDBOX SECRET
+    private static final String MERCHANT_ID = "1233436";
+
+    @Value("${merchant.secret}")
+    private String MERCHANT_SECRET; // SANDBOX SECRET
 
     public String generateHash(String orderId, Double amount, String currency) {
 
