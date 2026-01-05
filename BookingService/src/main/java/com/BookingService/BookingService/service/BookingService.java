@@ -12,9 +12,11 @@ import com.BookingService.BookingService.repository.TripRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -86,9 +88,9 @@ public class BookingService {
         }
 
         // Handle Hotel (Can be null) - 🔴 NEW LOGIC
-        if (dto.getResources().getHotel() != null) {
-            booking.setHotelId(dto.getResources().getHotel().getHotelId().intValue());
-        }
+//        if (dto.getResources().getHotel() != null) {
+//            booking.setHotelId(dto.getResources().getHotel().getHotelId().intValue());
+//        }
         // Booker info
         booking.setBookerName(dto.getBookingDetails().getNameOfBooker());
         booking.setBookerEmail(dto.getBookingDetails().getBookerEmail());
@@ -244,14 +246,15 @@ public class BookingService {
         return dtoList;
     }
 
-
     public BookingSystemResponseById getBookingById(Long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Booking not found"));
 
         Trip trip = tripRepository.findById(booking.getTripId())
-                .orElseThrow(() -> new RuntimeException("Trip not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Trip not found"));
 
         BookingSystemResponseById response = new BookingSystemResponseById();
 
@@ -259,71 +262,92 @@ public class BookingService {
         response.setReferenceId(booking.getReferenceId());
 
         // User
-        response.setUser(
-                new UserDto(
-                        booking.getTouristId(),
-                        "TOURIST"
-                )
+        response.setUser(new UserDto(
+                booking.getTouristId(),
+                "TOURIST"
+        ));
+
+        // Passengers (FIXED)
+        PassengerDto passengers = new PassengerDto(
+                booking.getAdults(),
+                booking.getChildren(),
+                booking.getBabies()
         );
 
         // Booking details
-        response.setBookingDetails(
-                new BookingDetailsDto(
-                        booking.getBookerName(),
-                        booking.getPassportNumber(),
-                        booking.getBookerEmail(),
-                        booking.getBookerPhone(),
-                        booking.getArrivalDateTime(),
-                        booking.getDepartureDateTime(),
-                        booking.getFlightNumber(),
-                        booking.getDepartureAirport(),
-                        null // passengers (map if needed)
-                )
-        );
+        response.setBookingDetails(new BookingDetailsDto(
+                booking.getBookerName(),
+                booking.getPassportNumber(),
+                booking.getBookerEmail(),
+                booking.getBookerPhone(),
+                booking.getArrivalDateTime(),
+                booking.getDepartureDateTime(),
+                booking.getFlightNumber(),
+                booking.getDepartureAirport(),
+                passengers
+        ));
 
-        // Trip details
-        response.setTripDetails(
-                new TripDetailsDto(
-                        trip.getStartLocation(),
-                        trip.getEndLocation(),
-                        trip.getStartDateTime().toLocalDate(),
-                        trip.getEndDateTime().toLocalDate(),
-                        booking.getVehicleId() != null,
-                        routeRepository.findWayPointsByTripId(trip.getTripId())
-                )
-        );
+        // Trip details (NULL SAFE)
+        response.setTripDetails(new TripDetailsDto(
+                trip.getStartLocation(),
+                trip.getEndLocation(),
+                trip.getStartDateTime().toLocalDate(),
+                trip.getEndDateTime().toLocalDate(),
+                booking.getVehicleId() != null,
+                routeRepository.findWayPointsByTripId(trip.getTripId()) != null
+                        ? routeRepository.findWayPointsByTripId(trip.getTripId())
+                        : List.of()
+        ));
 
-        // Route details
-        response.setRouteDetails(
-                new RouteDetailsDto(
-                        trip.getDistance(),
-                        trip.getDuration(),
-                        null,
-                        null,
-                        trip.getEstimatedCost().doubleValue()
-                )
-        );
+        // Route details (NULL SAFE)
+        response.setRouteDetails(new RouteDetailsDto(
+                trip.getDistance(),
+                trip.getDuration(),
+                null,
+                null,
+                trip.getEstimatedCost() != null
+                        ? trip.getEstimatedCost().doubleValue()
+                        : 0.0
+        ));
 
         // Resources
         response.setResources(
                 new ResourcesDto(
-                        null, // vehicle
-                        null, // driver
-                        null  // guide
+                        booking.getVehicleId() != null
+                                ? new VehicleDto(
+                                booking.getVehicleId().longValue(),
+                                null,
+                                null,
+                                null
+                        )
+                                : null,
+
+                        booking.getDriverId() != null
+                                ? new DriverDto(
+                                booking.getDriverId().longValue(),
+                                null,
+                                null,
+                                null
+                        )
+                                : null,
+
+                        null,
+                        null
                 )
         );
 
+
+
         // Metadata
-        response.setMetadata(
-                new MetadataDto(
-                        booking.getDateCreated(),
-                        "SYSTEM",
-                        booking.getPackageId()
-                )
-        );
+        response.setMetadata(new MetadataDto(
+                booking.getDateCreated(),
+                "SYSTEM",
+                booking.getPackageId()
+        ));
 
         return response;
     }
+
 
     public void sendEmail(Long bookingId, EmailDetailsDto emailDetailsDto) {
 
