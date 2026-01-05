@@ -35,7 +35,7 @@ public class BookingController {
 
     @GetMapping("get_booking_by_id/{bookingId}")
     @ResponseBody
-    public ResponseEntity<BookingSystemResponseById> getBookingById(@PathVariable int bookingId) {
+    public ResponseEntity<BookingSystemResponseById> getBookingById(@PathVariable Long bookingId) {
         BookingSystemResponseById  bookings = bookingService.getBookingById(bookingId);
         return ResponseEntity.ok(bookings);
     }
