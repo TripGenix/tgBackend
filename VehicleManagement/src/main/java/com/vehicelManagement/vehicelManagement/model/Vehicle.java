@@ -43,7 +43,6 @@ public class Vehicle {
     @Column(name = "location")
     private String location;
 
-    // 🟢 NEW: Location Coordinates
     @Column(name = "latitude")
     private Double latitude;
 

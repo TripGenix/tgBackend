@@ -24,10 +24,6 @@ public class WebVehicleResponse {
     private Double longitude;
     private List<String> vehicleImages;
     private String location;
-    private Integer doorCount;
-    private Double power;
-    private Double topSpeed;
-    private Double acceleration;
-    private String mainImage;
+
 
 }

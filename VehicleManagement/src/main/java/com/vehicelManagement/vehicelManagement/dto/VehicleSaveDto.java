@@ -38,10 +38,6 @@ public class VehicleSaveDto {
     private String ownerImage;           // single image URL
     private String documentUrl;
     private String location;
-    private Integer doorCount;
-    private Double power;
-    private Double topSpeed;
-    private Double acceleration;
-    private String mainImage;
+
 
 }

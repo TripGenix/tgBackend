@@ -29,9 +29,5 @@ public class VehicleReciveDto {
     private OwnerDto owner;
 
     private String location;
-    private Integer doorCount;
-    private Double power;
-    private Double topSpeed;
-    private Double acceleration;
-    private String mainImage;
+
 }
