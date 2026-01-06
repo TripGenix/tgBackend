@@ -50,17 +50,6 @@ public class Vehicle {
     @Column(name = "longitude")
     private Double longitude;
 
-    @Column(name = "door_count")
-    private Integer doorCount;
-    @Column(name = "power")
-    private Double power;
-    @Column(name = "top_speed")
-    private Double topSpeed;
-    @Column(name = "acceleration")
-    private Double acceleration;
-    @Column(name = "main_image")
-    private String mainImage;
-
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private Owner owner;
