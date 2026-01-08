@@ -27,6 +27,7 @@
       <module>EmailService</module>
 
     <module>HotelManagement</module>
+      <module>Tour_Guide_Service</module>
 
   </modules>
   <build>
