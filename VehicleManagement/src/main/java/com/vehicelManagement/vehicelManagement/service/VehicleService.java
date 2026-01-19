@@ -84,6 +84,7 @@ public class VehicleService {
 
         vehicle.setLatitude(dto.getLatitude());
         vehicle.setLongitude(dto.getLongitude());
+        vehicle.setDriverSalaryPerDay(dto.getDriverSalaryPerDay());
         vehicle = vehicleRepository.save(vehicle);
         System.out.println(vehicle);
 
@@ -95,6 +96,7 @@ public class VehicleService {
                 vehicleImageRepository.save(image);
             }
         }
+
 
         return modelMapper.map(vehicle, VehicleDto.class);
     }
@@ -147,6 +149,7 @@ public class VehicleService {
         vehicle.setPassengerCount(dto.getPassengerCount());
         vehicle.setCostPerKm(BigDecimal.valueOf(dto.getCostPerKm()));
         vehicle.setBookingPrice(BigDecimal.valueOf(dto.getBookingPrice()));
+        vehicle.setDriverSalaryPerDay(dto.getDriverSalaryPerDay());
         vehicle.setStatus(dto.getStatus());
 
         // Update PDF document
@@ -163,7 +166,7 @@ public class VehicleService {
         if (dto.getVehicleImages() != null && !dto.getVehicleImages().isEmpty()) {
 
             // Delete all old images
-            //vehicleImageRepository.deleteByVehicle_VehicleId(vehicle.getVehicleId());
+            vehicleImageRepository.deleteByVehicle_VehicleId(vehicle.getVehicleId());
 
             // Save new images
             for (String url : dto.getVehicleImages()) {

@@ -27,6 +27,7 @@ public class VehicleReciveDto {
     private List<String> vehicleImages;
     private String documentUrl;
     private OwnerDto owner;
+    private BigDecimal driverSalaryPerDay;
 
     private String location;
 

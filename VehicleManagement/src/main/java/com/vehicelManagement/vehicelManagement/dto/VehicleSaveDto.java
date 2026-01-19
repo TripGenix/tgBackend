@@ -23,6 +23,8 @@ public class VehicleSaveDto {
     private String description;
     private Double latitude;
     private Double longitude;
+    private BigDecimal driverSalaryPerDay;
+
     // Owner Details
     private String ownerName;
     private String ownerId;

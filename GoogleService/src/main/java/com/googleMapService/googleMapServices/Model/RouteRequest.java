@@ -9,4 +9,5 @@ public class RouteRequest {
     private String start;
     private String end;
     private List<String> waypoints;
+    private String mode ="driving";
 }
