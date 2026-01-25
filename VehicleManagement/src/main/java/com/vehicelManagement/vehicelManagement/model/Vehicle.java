@@ -49,6 +49,9 @@ public class Vehicle {
     @Column(name = "longitude")
     private Double longitude;
 
+    @Column(name = "driver_salary_per_day" , nullable = false)
+    private BigDecimal driverSalaryPerDay;
+
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private Owner owner;

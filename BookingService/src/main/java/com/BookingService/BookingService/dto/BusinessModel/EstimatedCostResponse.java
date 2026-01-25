@@ -8,17 +8,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EstimatedCostResponse {
-    // Base trip cost before commission (T)
-    private double baseTripCost;
-
-    // Total amount tourist has to pay (T + 10%)
-    private double touristPayAmount;
-
-    // Amount driver / vehicle owner receives (T - 10%)
-    private double driverReceiveAmount;
-
-    // TripGeix platform earning (20% of T)
-    private double platformEarning;
-
+    private Double baseTripCost;
+    private Double touristPayAmount;
+    private Double driverReceives;
+    private Double tripGeixEarns;
     private int estimatedDays;
+
 }

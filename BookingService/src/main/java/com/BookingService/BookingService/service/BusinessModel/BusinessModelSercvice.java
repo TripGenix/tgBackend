@@ -1,6 +1,9 @@
 package com.BookingService.BookingService.service.BusinessModel;
 
 import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostRequestDto;
+
+import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostResponse;
+
 import com.BookingService.BookingService.dto.BusinessModel.VehicleReciveDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,12 +17,14 @@ public class BusinessModelSercvice {
         this.webClient = webClient;
     }
 
-    public double calculateEstimatedCost(EstimatedCostRequestDto dto) {
-        double vehicleCost=0;
-        Long vehicleId = dto.getVehicleId();
+
+    public EstimatedCostResponse calculateEstimatedCost(
+            EstimatedCostRequestDto dto) {
 
         VehicleReciveDto vehicle = webClient.get()
-                .uri("http://localhost:8085/vehicleController/api/v1/detailsOfVehicle/{id}", vehicleId)
+                .uri("http://localhost:8085/vehicleController/api/v1/detailsOfVehicle/{id}",
+                        dto.getVehicleId())
+
                 .retrieve()
                 .bodyToMono(VehicleReciveDto.class)
                 .block();
@@ -28,11 +33,48 @@ public class BusinessModelSercvice {
             throw new RuntimeException("Vehicle not found");
         }
 
-        double distance = dto.getDistance();
+        double D = dto.getDistance();
+        int N = calculateTripDays(D);
 
-        vehicleCost += (vehicle.getBookingPrice().doubleValue()
-                        + (distance * vehicle.getCostPerKm().doubleValue()));
+        double Cd = vehicle.getCostPerKm().doubleValue();
+        double An = vehicle.getDriverSalaryPerDay().doubleValue();
+//        double On = vehicle.getOvernightCharge().doubleValue();
+        double On = 3000;
 
-        return vehicleCost;
+        // Distance-based cost
+        double Td = D * Cd;
+
+        // Day-based cost
+        double Tday = (N * An) + ((N - 1) * On);
+
+        // Base trip cost
+        double T = Td + Tday;
+
+        // Commission
+        double platformFee = T * 0.10;
+        double touristPays = T + platformFee;
+        double driverReceives = T - platformFee;
+        double tripGeixEarns = T * 0.20;
+
+        return new EstimatedCostResponse(
+                T,
+                touristPays,
+                driverReceives,
+                tripGeixEarns,
+                N
+        );
     }
+
+    public int calculateTripDays(double distanceKm) {
+
+        final int MAX_KM_PER_DAY = 500;
+
+        if (distanceKm <= 0) {
+            throw new IllegalArgumentException("Distance must be greater than 0");
+        }
+
+        return (int) Math.ceil(distanceKm / MAX_KM_PER_DAY);
+    }
+
+
 }

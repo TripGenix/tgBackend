@@ -1,5 +1,6 @@
 package com.BookingService.BookingService.controller;
 
+import com.BookingService.BookingService.dto.ActionResponse;
 import com.BookingService.BookingService.dto.BookingRequestDto;
 import com.BookingService.BookingService.dto.BookingResponseDto;
 import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostRequestDto;
@@ -40,6 +41,12 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
+    @GetMapping("get_confirmed_bookings")
+    public ResponseEntity<List<BookingSystemResponseDto>> confirmedBooking() {
+        List<BookingSystemResponseDto> bookings = bookingService.getConfirmedBookings();
+        return ResponseEntity.ok(bookings);
+    }
+
     @GetMapping("get_booking_by_id/{bookingId}")
     @ResponseBody
     public ResponseEntity<BookingSystemResponseById> getBookingById(@PathVariable Long bookingId) {
@@ -71,6 +78,35 @@ public class BookingController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @PostMapping("/confirmTourByTourist/{bookingId}")
+    public ResponseEntity<ActionResponse> confirmTourByTourist(
+            @PathVariable Long bookingId
+    ) {
+        ActionResponse response = bookingService.confirmBookingByTourist(bookingId);
+
+        if (!response.isSuccess()) {
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/cancelTourByTourist/{bookingId}")
+    public ResponseEntity<ActionResponse> cancelTourByTourist(
+            @PathVariable Long bookingId
+    ) {
+        ActionResponse response = bookingService.cancelTourByTourist(bookingId);
+
+        if (!response.isSuccess()) {
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+
 
 
 }

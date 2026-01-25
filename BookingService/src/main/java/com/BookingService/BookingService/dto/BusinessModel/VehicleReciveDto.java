@@ -1,4 +1,4 @@
-package com.vehicelManagement.vehicelManagement.dto;
+package com.BookingService.BookingService.dto.BusinessModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class VehicleDto {
+@NoArgsConstructor
+public class VehicleReciveDto {
     private Integer vehicleId;
     private String numberPlate;
     private String type;
@@ -22,7 +22,7 @@ public class VehicleDto {
     private LocalDateTime createdAt;
     private String vehicleName;
     private String location;
-    private BigDecimal driver_salary_per_day;
+    private BigDecimal driverSalaryPerDay;
     private Double latitude;
     private Double longitude;
 }
