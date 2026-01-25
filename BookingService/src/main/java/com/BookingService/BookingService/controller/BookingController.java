@@ -79,6 +79,7 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
+
     @PostMapping("/confirmTourByTourist/{bookingId}")
     public ResponseEntity<ActionResponse> confirmTourByTourist(
             @PathVariable Long bookingId
@@ -104,6 +105,7 @@ public class BookingController {
 
         return ResponseEntity.ok(response);
     }
+
 
 
 

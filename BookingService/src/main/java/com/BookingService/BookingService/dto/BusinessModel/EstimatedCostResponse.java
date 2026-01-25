@@ -14,5 +14,4 @@ public class EstimatedCostResponse {
     private Double tripGeixEarns;
     private int estimatedDays;
 
-
 }

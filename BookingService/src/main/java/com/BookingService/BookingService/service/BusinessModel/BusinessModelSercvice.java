@@ -1,7 +1,9 @@
 package com.BookingService.BookingService.service.BusinessModel;
 
 import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostRequestDto;
+
 import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostResponse;
+
 import com.BookingService.BookingService.dto.BusinessModel.VehicleReciveDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,12 +17,14 @@ public class BusinessModelSercvice {
         this.webClient = webClient;
     }
 
+
     public EstimatedCostResponse calculateEstimatedCost(
             EstimatedCostRequestDto dto) {
 
         VehicleReciveDto vehicle = webClient.get()
                 .uri("http://localhost:8085/vehicleController/api/v1/detailsOfVehicle/{id}",
                         dto.getVehicleId())
+
                 .retrieve()
                 .bodyToMono(VehicleReciveDto.class)
                 .block();

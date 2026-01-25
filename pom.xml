@@ -28,6 +28,7 @@
 
     <module>HotelManagement</module>
       <module>Tour_Guide_Service</module>
+      <module>UserService</module>
 
   </modules>
   <build>

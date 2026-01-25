@@ -23,6 +23,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     // Password Reset Fields
     @Column(name = "reset_token")
     private String resetToken;
