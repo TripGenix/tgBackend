@@ -1,4 +1,6 @@
 package com.BookingService.BookingService.service;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+
 
 import com.BookingService.BookingService.dto.*;
 import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseById;
@@ -13,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -38,6 +41,9 @@ public class BookingService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    SimpMessagingTemplate messagingTemplate;
 
     private final WebClient webClient;
 
@@ -160,6 +166,11 @@ public class BookingService {
         response.setStatus(savedBooking.getStatus());
         response.setCreatedAt(savedBooking.getDateCreated());
         response.setReferenceId(savedBooking.getReferenceId());
+
+        messagingTemplate.convertAndSend(
+                "/topic/new-tour-add",
+                response   //
+        );
 
         return response;
     }
@@ -383,5 +394,107 @@ public class BookingService {
         bookingRepository.save(booking);
     }
 
+
+    @Transactional
+    public ActionResponse confirmBookingByTourist(Long bookingId) {
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if (Boolean.TRUE.equals(booking.getIsTouristCancelled())) {
+            return new ActionResponse(
+                    false,
+                    "This tour has already been cancelled. You cannot confirm it."
+            );
+        }
+
+        if (Boolean.TRUE.equals(booking.getIsTouristConfirm())) {
+            return new ActionResponse(
+                    false,
+                    "This tour is already confirmed."
+            );
+        }
+
+        booking.setIsTouristConfirm(true);
+        booking.setTouristConfirmedAt(LocalDateTime.now());
+        booking.setStatus("CONFIRMED");
+
+        bookingRepository.save(booking);
+
+        return new ActionResponse(
+                true,
+                "Tour confirmed successfully."
+        );
+    }
+
+
+    @Transactional
+    public ActionResponse cancelTourByTourist(Long bookingId) {
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if (Boolean.TRUE.equals(booking.getIsTouristConfirm())) {
+            return new ActionResponse(
+                    false,
+                    "This tour has already been confirmed. You cannot cancel it."
+            );
+        }
+
+        if (Boolean.TRUE.equals(booking.getIsTouristCancelled())) {
+            return new ActionResponse(
+                    false,
+                    "This tour is already cancelled."
+            );
+        }
+
+        booking.setIsTouristCancelled(true);
+        booking.setTouristCancelledAt(LocalDateTime.now());
+        booking.setStatus("CANCELLED");
+
+        bookingRepository.save(booking);
+
+        return new ActionResponse(
+                true,
+                "Tour cancelled successfully."
+        );
+    }
+
+
+    public List<BookingSystemResponseDto> getConfirmedBookings() {
+
+        // Fetch NEW bookings
+        List<Booking> bookings = bookingRepository.findByStatus("CONFIRMED");
+
+        //Map entity list → DTO list
+        List<BookingSystemResponseDto> dtoList =
+                modelMapper.map(
+                        bookings,
+                        new TypeToken<List<BookingSystemResponseDto>>() {}.getType()
+                );
+
+        //  Enrich DTOs with derived & missing fields
+        for (int i = 0; i < bookings.size(); i++) {
+
+            Booking booking = bookings.get(i);
+            BookingSystemResponseDto dto = dtoList.get(i);
+
+            // FIX: manually map createdAt
+            dto.setCreatedAt(booking.getDateCreated());
+
+            //Route
+            dto.setRoute(
+                    routeRepository.findWayPointsByTripId(booking.getTripId())
+            );
+
+            // Trip dates
+            tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+                dto.setStartDate(trip.getStartDateTime());
+                dto.setEndDate(trip.getEndDateTime());
+            });
+        }
+
+        return dtoList;
+    }
 
 }

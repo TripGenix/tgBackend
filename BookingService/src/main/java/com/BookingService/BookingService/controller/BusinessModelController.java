@@ -1,6 +1,7 @@
 package com.BookingService.BookingService.controller;
 
 import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostRequestDto;
+import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostResponse;
 import com.BookingService.BookingService.service.BusinessModel.BusinessModelSercvice;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class BusinessModelController {
     }
 
     @PostMapping("get_estimated_booking_cost")
-    public Double getEstimatedBookingCost(@RequestBody  EstimatedCostRequestDto estimatedCostRequestDto) {
+    public EstimatedCostResponse getEstimatedBookingCost(@RequestBody  EstimatedCostRequestDto estimatedCostRequestDto) {
         return (businessModelSercvice.calculateEstimatedCost(estimatedCostRequestDto));
     }
 }
