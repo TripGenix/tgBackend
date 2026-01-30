@@ -1,11 +1,14 @@
 package com.driverManagement.DriverManagement.services;
 
+import com.BookingService.BookingService.dto.EmailDetailsDto;
+import com.driverManagement.DriverManagement.Dto.ConfirmBookingEmailRequest;
 import com.driverManagement.DriverManagement.Dto.TourStatusUpdateDto;
 import com.driverManagement.DriverManagement.models.Booking;
 import com.driverManagement.DriverManagement.repository.TourRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.awt.print.Book;
 import java.time.LocalDateTime;
@@ -19,6 +22,12 @@ public class TourService {
 
     @Autowired
     SimpMessagingTemplate messagingTemplate;
+
+    private final WebClient webClient;
+
+    public TourService(WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public List<Booking> getPendingApprovedBookings(int driverId) {
         return tourRepo.findByDriverIdAndIsDriverConfirmAndIsDriverCancelled(driverId,false,false);
@@ -46,7 +55,26 @@ public class TourService {
         tour.setIsDriverConfirm(true);
         tour.setDriverConfirmedAt(LocalDateTime.now());
 
-        tourRepo.save(tour);
+        try{
+            tourRepo.save(tour);
+            webClient.post()
+                    .uri(
+                            "http://localhost:8087/bookingservice/api/v1/send_confirm_booking_email/{id}",
+                            tour.getBookingId()
+                    )
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .doOnSuccess(res ->
+                            System.out.println("✅ Email trigger sent to Booking Service")
+                    )
+                    .doOnError(err ->
+                            System.err.println("❌ Failed to trigger email: " + err.getMessage())
+                    )
+                    .subscribe();
+        }catch (Exception e){
+            return new TourStatusUpdateDto(tourId, "ERROR");
+        }
+
         messagingTemplate.convertAndSend(
                 "/topic/tour-updates",
                 new TourStatusUpdateDto(tourId, "CONFIRMED")

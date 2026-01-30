@@ -47,6 +47,12 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
+    @GetMapping("get_driver_confirmed_bookings")
+    public ResponseEntity<List<BookingSystemResponseDto>> driverConfirmedBooking() {
+        List<BookingSystemResponseDto> bookings = bookingService.getDriverConfirmedBookings();
+        return ResponseEntity.ok(bookings);
+    }
+
     @GetMapping("get_booking_by_id/{bookingId}")
     @ResponseBody
     public ResponseEntity<BookingSystemResponseById> getBookingById(@PathVariable Long bookingId) {
@@ -62,9 +68,9 @@ public class BookingController {
         return new ResponseEntity<>(booking, HttpStatus.CREATED);
     }
 
-    @PostMapping("/send_confirm_booking_email")
-    public ResponseEntity<String> confirmBooking(@RequestBody ConfirmBookingEmailRequest request) {
-        bookingService.sendEmail(request.getBookingId(), request.getEmail());
+    @PostMapping("/send_confirm_booking_email/{bookingId}")
+    public ResponseEntity<String> confirmBooking(@PathVariable Long bookingId) {
+        bookingService.sendEmail(bookingId);
         return ResponseEntity.ok("Email Send Successfully");
 
     }

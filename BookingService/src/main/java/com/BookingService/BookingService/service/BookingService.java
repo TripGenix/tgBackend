@@ -1,4 +1,6 @@
 package com.BookingService.BookingService.service;
+import com.BookingService.BookingService.EmailTemplates.EmailTemplateBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 
@@ -360,12 +362,26 @@ public class BookingService {
         return response;
     }
 
+    @Value("${web.app.url}")
+    private String webAppUrl;
 
-    public void sendEmail(Long bookingId, EmailDetailsDto emailDetailsDto) {
+    public void sendEmail(Long bookingId) {
+
+        BookingSystemResponseById booking = getBookingById(bookingId);
+
+        EmailTemplateBuilder emailTemplateBuilder = new EmailTemplateBuilder();
+        EmailDetailsDto emailDetails = new EmailDetailsDto();
+
+        String paymentUrl = webAppUrl + "/payment/" + bookingId;
+        String cancelUrl  = webAppUrl + "/cancel-tour?bookingId=" + bookingId;
+
+        emailDetails.setMsgBody( emailTemplateBuilder.buildConfirmationEmail(booking,paymentUrl,cancelUrl));
+        emailDetails.setRecipient(booking.getBookingDetails().getBookerEmail());
+        emailDetails.setSubject("TripGenix Tour Confirmation Email");
 
         webClient.post()
                 .uri("http://localhost:8088/email/api/v1/send")
-                .bodyValue(emailDetailsDto)
+                .bodyValue(emailDetails)
                 .retrieve()
                 .bodyToMono(String.class)
                 .doOnSuccess(response -> {
@@ -496,5 +512,43 @@ public class BookingService {
 
         return dtoList;
     }
+
+    public List<BookingSystemResponseDto> getDriverConfirmedBookings() {
+
+        // Fetch NEW bookings
+        List<Booking> bookings = bookingRepository.findByIsDriverConfirm(true);
+
+        //Map entity list → DTO list
+        List<BookingSystemResponseDto> dtoList =
+                modelMapper.map(
+                        bookings,
+                        new TypeToken<List<BookingSystemResponseDto>>() {}.getType()
+                );
+
+        //  Enrich DTOs with derived & missing fields
+        for (int i = 0; i < bookings.size(); i++) {
+
+            Booking booking = bookings.get(i);
+            BookingSystemResponseDto dto = dtoList.get(i);
+
+            // FIX: manually map createdAt
+            dto.setCreatedAt(booking.getDateCreated());
+
+            //Route
+            dto.setRoute(
+                    routeRepository.findWayPointsByTripId(booking.getTripId())
+            );
+
+            // Trip dates
+            tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+                dto.setStartDate(trip.getStartDateTime());
+                dto.setEndDate(trip.getEndDateTime());
+            });
+        }
+
+        return dtoList;
+    }
+
+
 
 }
