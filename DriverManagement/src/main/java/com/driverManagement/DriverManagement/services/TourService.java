@@ -1,10 +1,13 @@
 package com.driverManagement.DriverManagement.services;
 
 import com.BookingService.BookingService.dto.EmailDetailsDto;
+import com.driverManagement.DriverManagement.Config.OtpGenerator;
 import com.driverManagement.DriverManagement.Dto.ConfirmBookingEmailRequest;
 import com.driverManagement.DriverManagement.Dto.TourStatusUpdateDto;
 import com.driverManagement.DriverManagement.models.Booking;
+import com.driverManagement.DriverManagement.models.Trip;
 import com.driverManagement.DriverManagement.repository.TourRepository;
+import com.driverManagement.DriverManagement.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -13,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TourService {
@@ -21,12 +25,22 @@ public class TourService {
     TourRepository tourRepo;
 
     @Autowired
+    TripRepository tripRepo;
+
+    @Autowired
     SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    NotificationService notificationService;
+
+    @Autowired
+    OtpGenerator otpGenerator;
 
     private final WebClient webClient;
 
     public TourService(WebClient webClient) {
         this.webClient = webClient;
+
     }
 
     public List<Booking> getPendingApprovedBookings(int driverId) {
@@ -105,4 +119,64 @@ public class TourService {
         return new TourStatusUpdateDto(tourId, "CANCELLED");
     }
 
+    // 1️⃣ Request OTP
+    public void requestTourStart(int tourId) {
+
+        Booking tour = tourRepo.findById(tourId)
+                .orElseThrow(() ->
+                        new RuntimeException("Tour not found with id: " + tourId)
+                );
+
+        Trip trip = tripRepo.findByTripId(
+                Math.toIntExact(tour.getTripId())
+        );
+
+        String otp = otpGenerator.generateOtp();
+
+        trip.setStartOtp(otp);
+        trip.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+        trip.setOtpVerified(false);
+
+        tripRepo.save(trip);
+
+        notificationService.sendOtp(
+                tour.getTouristId(),
+                otp
+        );
+    }
+
+    // 2️⃣ Verify OTP & Start Tour
+    public void verifyOtpAndStartTour(int tourId, String enteredOtp) {
+
+        Booking tour = tourRepo.findById(tourId)
+                .orElseThrow(() ->
+                        new RuntimeException("Tour not found")
+                );
+
+        Trip trip = tripRepo.findByTripId(
+                Math.toIntExact(tour.getTripId())
+        );
+
+        // ⏰ Expiry check
+        if (trip.getOtpExpiry() == null ||
+                trip.getOtpExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("OTP expired");
+        }
+
+        // ❌ Invalid OTP
+        if (!trip.getStartOtp().equals(enteredOtp)) {
+            throw new RuntimeException("Invalid OTP");
+        }
+
+        // ✅ Start tour
+        trip.setTourStart(true);
+        trip.setTourStartDateTime(LocalDateTime.now());
+        trip.setOtpVerified(true);
+
+        // clear OTP
+        trip.setStartOtp(null);
+        trip.setOtpExpiry(null);
+
+        tripRepo.save(trip);
+    }
 }
