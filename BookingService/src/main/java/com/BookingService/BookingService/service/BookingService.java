@@ -480,7 +480,9 @@ public class BookingService {
     public List<BookingSystemResponseDto> getConfirmedBookings() {
 
         // Fetch NEW bookings
-        List<Booking> bookings = bookingRepository.findByStatus("CONFIRMED");
+        List<Booking> bookings = bookingRepository
+                .findByStatus("CONFIRMED");
+
 
         //Map entity list → DTO list
         List<BookingSystemResponseDto> dtoList =
@@ -550,5 +552,40 @@ public class BookingService {
     }
 
 
+    public List<BookingSystemResponseDto> getCancledBookings() {
+        // Fetch NEW bookings
+        List<Booking> bookings = bookingRepository
+                .findByStatus("CANCELLED");
 
+
+        //Map entity list → DTO list
+        List<BookingSystemResponseDto> dtoList =
+                modelMapper.map(
+                        bookings,
+                        new TypeToken<List<BookingSystemResponseDto>>() {}.getType()
+                );
+
+        //  Enrich DTOs with derived & missing fields
+        for (int i = 0; i < bookings.size(); i++) {
+
+            Booking booking = bookings.get(i);
+            BookingSystemResponseDto dto = dtoList.get(i);
+
+            // FIX: manually map createdAt
+            dto.setCreatedAt(booking.getDateCreated());
+
+            //Route
+            dto.setRoute(
+                    routeRepository.findWayPointsByTripId(booking.getTripId())
+            );
+
+            // Trip dates
+            tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+                dto.setStartDate(trip.getStartDateTime());
+                dto.setEndDate(trip.getEndDateTime());
+            });
+        }
+
+        return dtoList;
+    }
 }

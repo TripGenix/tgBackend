@@ -47,6 +47,12 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
+    @GetMapping("get_cancled_bookings")
+    public ResponseEntity<List<BookingSystemResponseDto>> cancledBooking() {
+        List<BookingSystemResponseDto> bookings = bookingService.getCancledBookings();
+        return ResponseEntity.ok(bookings);
+    }
+
     @GetMapping("get_driver_confirmed_bookings")
     public ResponseEntity<List<BookingSystemResponseDto>> driverConfirmedBooking() {
         List<BookingSystemResponseDto> bookings = bookingService.getDriverConfirmedBookings();
