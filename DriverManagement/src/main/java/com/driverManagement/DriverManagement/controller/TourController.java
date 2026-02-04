@@ -56,4 +56,10 @@ public class TourController {
         return ResponseEntity.ok("Tour started successfully");
     }
 
+    @PostMapping("/{tourId}/finish-tour")
+    public ResponseEntity<String> finishTour(@PathVariable int tourId) {
+        tourService.finishTour(tourId);
+        return ResponseEntity.ok("Tour finished");
+    }
+
 }

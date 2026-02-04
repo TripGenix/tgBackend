@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookingRepository  extends JpaRepository<Booking, Long> {
@@ -21,4 +22,6 @@ public interface BookingRepository  extends JpaRepository<Booking, Long> {
 
 
     List<Booking> findByIsDriverConfirm(boolean b);
+
+    Optional<Object> findByReferenceId(String orderId);
 }

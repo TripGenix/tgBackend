@@ -53,6 +53,18 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
+    @GetMapping("get_started_bookings")
+    public ResponseEntity<List<BookingSystemResponseDto>> startedBooking() {
+        List<BookingSystemResponseDto> bookings = bookingService.getStartedBookings();
+        return ResponseEntity.ok(bookings);
+    }
+
+    @GetMapping("get_finished_bookings")
+    public ResponseEntity<List<BookingSystemResponseDto>> finishedBookings() {
+        List<BookingSystemResponseDto> bookings = bookingService.getFinishedBookings();
+        return ResponseEntity.ok(bookings);
+    }
+
     @GetMapping("get_driver_confirmed_bookings")
     public ResponseEntity<List<BookingSystemResponseDto>> driverConfirmedBooking() {
         List<BookingSystemResponseDto> bookings = bookingService.getDriverConfirmedBookings();
