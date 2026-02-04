@@ -3,6 +3,7 @@ package com.driverManagement.DriverManagement.controller;
 import com.driverManagement.DriverManagement.Dto.DriverSaveDto;
 import com.driverManagement.DriverManagement.Dto.DriverUpdateDto;
 import com.driverManagement.DriverManagement.Dto.DriverResponseDto;
+import com.driverManagement.DriverManagement.models.Driver;
 import com.driverManagement.DriverManagement.services.DriverService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,12 @@ public class DriverController {
     @GetMapping
     public ResponseEntity<List<DriverResponseDto>> getAllDrivers() {
         List<DriverResponseDto> drivers = driverService.getAllDrivers();
+        return ResponseEntity.ok(drivers);
+    }
+
+    @GetMapping("/get-approved-drivers")
+    public ResponseEntity<List<DriverResponseDto>> getApprovedDrivers() {
+        List<DriverResponseDto> drivers = driverService.getApprovedDrivers();
         return ResponseEntity.ok(drivers);
     }
 
@@ -66,4 +73,10 @@ public class DriverController {
         }
 
     }
+
+    @PostMapping("/approve-driver/{driverId}")
+    public ResponseEntity<Driver> approveDriver(@PathVariable int driverId) {
+        return driverService.approveDriver(driverId);
+    }
+
 }

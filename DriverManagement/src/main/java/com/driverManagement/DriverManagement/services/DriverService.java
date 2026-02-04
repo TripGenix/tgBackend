@@ -8,6 +8,7 @@ import com.driverManagement.DriverManagement.repository.DriverRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -138,5 +139,39 @@ public class DriverService {
 
         driver.setIsDelete(true);
         driverRepository.save(driver);
+    }
+
+    public ResponseEntity<Driver> approveDriver(int driverId) {
+        Driver driver = driverRepository.findById(driverId)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        driver.setApproved(true);
+        driverRepository.save(driver);
+
+        return ResponseEntity.ok(driver);
+    }
+
+    public List<DriverResponseDto> getApprovedDrivers() {
+        List<Driver> drivers = driverRepository.findByApproved(true);
+
+        List<DriverResponseDto> dtos = new ArrayList<>();
+
+        for (Driver driver : drivers) {
+
+            // Map base fields
+            DriverResponseDto dto = modelMapper.map(driver, DriverResponseDto.class);
+
+            // Fetch allocated vehicles
+            List<Integer> allocatedVehicles = driverRepository.findAllocatedVehicles(driver.getDriverId());
+            dto.setSelectedVehicleByNumber(allocatedVehicles);
+
+            // Fetch allocated categories
+            List<Integer> allocatedCategories = driverRepository.findAllocatedCategories(driver.getDriverId());
+            dto.setSelectedVehicleCategories(allocatedCategories);
+
+            dtos.add(dto);
+        }
+
+        return dtos;
     }
 }
