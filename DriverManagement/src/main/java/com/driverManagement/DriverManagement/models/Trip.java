@@ -43,7 +43,7 @@ public class Trip {
 
     private LocalDateTime tourStartDateTime;
 
-    private boolean isTourEnd;
+    private boolean isTourEnd ;
 
     private LocalDateTime tourEndDateTime;
 

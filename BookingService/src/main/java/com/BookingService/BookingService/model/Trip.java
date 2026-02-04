@@ -38,4 +38,9 @@ public class Trip {
 
     @Column(name = "end_location")
     private String endLocation;
+
+    // 🔐 OTP fields
+    private String startOtp;
+    private LocalDateTime otpExpiry;
+    private boolean otpVerified=false;
 }

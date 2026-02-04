@@ -437,6 +437,12 @@ public class BookingService {
 
         bookingRepository.save(booking);
 
+        messagingTemplate.convertAndSend(
+                "/topic/confirmed-booking",
+                   1
+
+        );
+
         return new ActionResponse(
                 true,
                 "Tour confirmed successfully."
@@ -518,7 +524,8 @@ public class BookingService {
     public List<BookingSystemResponseDto> getDriverConfirmedBookings() {
 
         // Fetch NEW bookings
-        List<Booking> bookings = bookingRepository.findByIsDriverConfirm(true);
+        List<Booking> bookings = bookingRepository
+                .findByStatus("DRIVER_CONFIRMED");
 
         //Map entity list → DTO list
         List<BookingSystemResponseDto> dtoList =
@@ -587,5 +594,80 @@ public class BookingService {
         }
 
         return dtoList;
+    }
+
+    public List<BookingSystemResponseDto> getStartedBookings() {
+        // Fetch NEW bookings
+        List<Booking> bookings = bookingRepository
+                .findByStatus("STARTED");
+
+
+        //Map entity list → DTO list
+        List<BookingSystemResponseDto> dtoList =
+                modelMapper.map(
+                        bookings,
+                        new TypeToken<List<BookingSystemResponseDto>>() {}.getType()
+                );
+
+        //  Enrich DTOs with derived & missing fields
+        for (int i = 0; i < bookings.size(); i++) {
+
+            Booking booking = bookings.get(i);
+            BookingSystemResponseDto dto = dtoList.get(i);
+
+            // FIX: manually map createdAt
+            dto.setCreatedAt(booking.getDateCreated());
+
+            //Route
+            dto.setRoute(
+                    routeRepository.findWayPointsByTripId(booking.getTripId())
+            );
+
+            // Trip dates
+            tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+                dto.setStartDate(trip.getStartDateTime());
+                dto.setEndDate(trip.getEndDateTime());
+            });
+        }
+
+        return dtoList;
+    }
+
+    public List<BookingSystemResponseDto> getFinishedBookings() {
+
+            List<Booking> bookings = bookingRepository
+                    .findByStatus("FINISHED");
+
+
+            //Map entity list → DTO list
+            List<BookingSystemResponseDto> dtoList =
+                    modelMapper.map(
+                            bookings,
+                            new TypeToken<List<BookingSystemResponseDto>>() {}.getType()
+                    );
+
+            //  Enrich DTOs with derived & missing fields
+            for (int i = 0; i < bookings.size(); i++) {
+
+                Booking booking = bookings.get(i);
+                BookingSystemResponseDto dto = dtoList.get(i);
+
+                // FIX: manually map createdAt
+                dto.setCreatedAt(booking.getDateCreated());
+
+                //Route
+                dto.setRoute(
+                        routeRepository.findWayPointsByTripId(booking.getTripId())
+                );
+
+                // Trip dates
+                tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+                    dto.setStartDate(trip.getStartDateTime());
+                    dto.setEndDate(trip.getEndDateTime());
+                });
+            }
+
+            return dtoList;
+
     }
 }

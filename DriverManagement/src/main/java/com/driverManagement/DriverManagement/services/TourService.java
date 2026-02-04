@@ -67,6 +67,7 @@ public class TourService {
         }
 
         tour.setIsDriverConfirm(true);
+        tour.setStatus("DRIVER_CONFIRMED");
         tour.setDriverConfirmedAt(LocalDateTime.now());
 
         try{
@@ -90,7 +91,7 @@ public class TourService {
         }
 
         messagingTemplate.convertAndSend(
-                "/topic/tour-updates",
+                "/topic/driver-confirm",
                 new TourStatusUpdateDto(tourId, "CONFIRMED")
         );
         return new TourStatusUpdateDto(tourId, "CONFIRMED");
@@ -119,7 +120,7 @@ public class TourService {
         return new TourStatusUpdateDto(tourId, "CANCELLED");
     }
 
-    // 1️⃣ Request OTP
+
     public void requestTourStart(int tourId) {
 
         Booking tour = tourRepo.findById(tourId)
@@ -145,7 +146,7 @@ public class TourService {
         );
     }
 
-    // 2️⃣ Verify OTP & Start Tour
+
     public void verifyOtpAndStartTour(int tourId, String enteredOtp) {
 
         Booking tour = tourRepo.findById(tourId)
@@ -157,25 +158,41 @@ public class TourService {
                 Math.toIntExact(tour.getTripId())
         );
 
-        // ⏰ Expiry check
         if (trip.getOtpExpiry() == null ||
                 trip.getOtpExpiry().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("OTP expired");
         }
 
-        // ❌ Invalid OTP
         if (!trip.getStartOtp().equals(enteredOtp)) {
             throw new RuntimeException("Invalid OTP");
         }
 
-        // ✅ Start tour
         trip.setTourStart(true);
+        tour.setStatus("STARTED");
         trip.setTourStartDateTime(LocalDateTime.now());
         trip.setOtpVerified(true);
 
         // clear OTP
         trip.setStartOtp(null);
         trip.setOtpExpiry(null);
+
+        tripRepo.save(trip);
+    }
+
+    public void finishTour(int tourId) {
+        Booking tour = tourRepo.findById(tourId)
+                .orElseThrow(() ->
+                        new RuntimeException("Tour not found")
+                );
+
+        Trip trip = tripRepo.findByTripId(
+                Math.toIntExact(tour.getTripId())
+        );
+
+        trip.setTourEnd(true);
+        tour.setStatus("FINISHED");
+        trip.setTourEndDateTime(LocalDateTime.now());
+        trip.setOtpVerified(true);
 
         tripRepo.save(trip);
     }

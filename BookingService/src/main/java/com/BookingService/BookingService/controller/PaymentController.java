@@ -2,6 +2,7 @@ package com.BookingService.BookingService.controller;
 
 import com.BookingService.BookingService.service.InvoiceService;
 import com.BookingService.BookingService.service.PaymentService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -40,4 +41,13 @@ public class PaymentController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
+
+    @PostMapping("/notify")
+    public ResponseEntity<String> paymentNotify(HttpServletRequest request) {
+
+//        System.out.println(request.getRequestURI());
+//        paymentService.handlePayHereNotification(request);
+        return ResponseEntity.ok("OK");
+    }
+
 }

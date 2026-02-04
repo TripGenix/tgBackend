@@ -11,5 +11,4 @@ public class VerifyOtpRequest {
     private int tourId;
     private String otp;
 
-
 }
