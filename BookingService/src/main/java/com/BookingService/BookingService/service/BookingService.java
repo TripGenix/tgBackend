@@ -1,6 +1,7 @@
 package com.BookingService.BookingService.service;
 import com.BookingService.BookingService.EmailTemplates.EmailTemplateBuilder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 
@@ -781,5 +782,48 @@ public class BookingService {
 
         return response;
     }
+
+    @Transactional
+    public ResponseEntity<ActionResponse> confirmByAdmin(Long bookingId) {
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Booking not found"));
+
+        if (booking.getTripId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Booking is not linked to any trip");
+        }
+
+        Trip trip = tripRepository.findById(booking.getTripId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Trip not found"));
+
+        if ("CONFIRMED_ADMIN".equalsIgnoreCase(trip.getStatus())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Trip is already confirmed");
+        }
+
+        // ✅ BigDecimal-safe validation
+        if (trip.getEstimatedCost() == null ||
+                trip.getEstimatedCost().compareTo(BigDecimal.ZERO) <= 0) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Estimated cost is invalid");
+        }
+
+        trip.setTotalCost(trip.getEstimatedCost());
+        trip.setStatus("CONFIRMED_ADMIN");
+        tripRepository.save(trip);
+
+        ActionResponse response = new ActionResponse(
+                true,
+                "Trip confirmed successfully",
+                bookingId
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 
 }

@@ -25,4 +25,6 @@ public class BusinessModelController {
     public EstimatedCostResponse getEstimatedBookingCost(@RequestBody  EstimatedCostRequestDto estimatedCostRequestDto) {
         return (businessModelSercvice.calculateEstimatedCost(estimatedCostRequestDto));
     }
+
+
 }

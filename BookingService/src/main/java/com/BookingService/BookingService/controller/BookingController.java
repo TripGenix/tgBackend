@@ -148,4 +148,9 @@ public class BookingController {
 //    }
 
 
+    @PostMapping("/confirm-by-admin/{bookingId}")
+    public ResponseEntity<ActionResponse> confirmByTripgenix(@PathVariable Long bookingId) {
+        return bookingService.confirmByAdmin(bookingId);
+    }
+
 }

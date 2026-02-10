@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ActionResponse {
-    private boolean success;
-    private String message;
-
-    public ActionResponse(boolean b, String tripConfirmedSuccessfully, Long bookingId) {
-    }
+public class PaymentDto {
+    private Long bookingId;
+    private String paymentType;
+    private BigDecimal paidAmount;
 }
