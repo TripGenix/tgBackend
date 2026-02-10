@@ -75,4 +75,19 @@ public class Driver {
 
     @Column(name = "nic_number")
     private String nicNumber;
+
+    @Column(name = "fcm_token", length = 500)
+    private String fcmToken;
+
+    @Column(name = "password", length = 255)
+    private String password;
+
+    @Column(name = "otp", length = 6)
+    private String otp;
+
+    @Column(name = "otp_expiry")
+    private LocalDateTime otpExpiry;
+
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
 }

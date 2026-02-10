@@ -1,7 +1,5 @@
 package com.driverManagement.DriverManagement.services;
 
-import com.BookingService.BookingService.dto.EmailDetailsDto;
-import com.driverManagement.DriverManagement.Dto.ConfirmBookingEmailRequest;
 import com.driverManagement.DriverManagement.Dto.TourStatusUpdateDto;
 import com.driverManagement.DriverManagement.models.Booking;
 import com.driverManagement.DriverManagement.repository.TourRepository;
@@ -10,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -59,7 +56,7 @@ public class TourService {
             tourRepo.save(tour);
             webClient.post()
                     .uri(
-                            "http://localhost:8087/bookingservice/api/v1/send_confirm_booking_email/{id}",
+                            "http://localhost:8084/bookingservice/api/v1/send_confirm_booking_email/{id}",
                             tour.getBookingId()
                     )
                     .retrieve()

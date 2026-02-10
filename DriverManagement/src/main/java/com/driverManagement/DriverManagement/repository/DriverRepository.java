@@ -52,4 +52,6 @@ public interface DriverRepository extends JpaRepository<Driver, Integer> {
     @Query(value = "DELETE FROM driver_allocated_vehicle_category WHERE driver_id = :driverId", nativeQuery = true)
     void deleteAllocatedCategories(int driverId);
 
+    Optional<Driver> findByEmail(String email);
+
 }

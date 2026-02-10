@@ -112,7 +112,11 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
-
+    @GetMapping("get_bookings_by_driver/{driverId}")
+    public ResponseEntity<List<BookingSystemResponseDto>> getBookingsByDriver(@PathVariable Long driverId) {
+        List<BookingSystemResponseDto> bookings = bookingService.getBookingsByDriverId(driverId);
+        return ResponseEntity.ok(bookings);
+    }
 
 
 }

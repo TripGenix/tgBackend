@@ -50,6 +50,8 @@ public class DriverResponseDto {
 
     private String nicNumber;
 
+    private String fcmToken;
+
     private List<Integer> selectedVehicleCategories;
 
     private List<Integer> selectedVehicleByNumber;
