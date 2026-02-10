@@ -444,48 +444,48 @@ public class BookingService {
 
             // Get all destinations (waypoints) for this trip
             List<String> destinations = routeRepository.findWayPointsByTripId(trip.getTripId());
-            String destinationsString = destinations != null && !destinations.isEmpty() 
-                    ? String.join(", ", destinations) 
+            String destinationsString = destinations != null && !destinations.isEmpty()
+                    ? String.join(", ", destinations)
                     : "";
 
             // Add comprehensive data for Flutter app (FCM data payload)
             // CRITICAL: Data payload is mandatory for onMessage to fire in background
             // All booking details included for frontend display
             Map<String, Object> data = new HashMap<>();
-            
+
             // Booking Reference
             data.put("referenceId", booking.getReferenceId() != null ? booking.getReferenceId() : "");
             data.put("bookingId", String.valueOf(booking.getBookingId()));
-            
+
             // Booker Details
             data.put("bookerName", booking.getBookerName() != null ? booking.getBookerName() : "");
             data.put("passengerName", booking.getBookerName() != null ? booking.getBookerName() : ""); // Alternative field name
             data.put("bookerEmail", booking.getBookerEmail() != null ? booking.getBookerEmail() : "");
             data.put("bookerPhone", booking.getBookerPhone() != null ? booking.getBookerPhone() : "");
             data.put("passportNumber", booking.getPassportNumber() != null ? booking.getPassportNumber() : "");
-            
+
             // Passenger Count
             data.put("adults", String.valueOf(booking.getAdults() != null ? booking.getAdults() : 0));
             data.put("children", String.valueOf(booking.getChildren() != null ? booking.getChildren() : 0));
             data.put("babies", String.valueOf(booking.getBabies() != null ? booking.getBabies() : 0));
-            int totalPassengers = (booking.getAdults() != null ? booking.getAdults() : 0) + 
-                                 (booking.getChildren() != null ? booking.getChildren() : 0) + 
+            int totalPassengers = (booking.getAdults() != null ? booking.getAdults() : 0) +
+                                 (booking.getChildren() != null ? booking.getChildren() : 0) +
                                  (booking.getBabies() != null ? booking.getBabies() : 0);
             data.put("totalPassengers", String.valueOf(totalPassengers));
             data.put("passengerCount", String.valueOf(totalPassengers)); // Alternative field name
-            
+
             // Flight Information
             data.put("flightNumber", booking.getFlightNumber() != null ? booking.getFlightNumber() : "");
             data.put("departureAirport", booking.getDepartureAirport() != null ? booking.getDepartureAirport() : "");
             data.put("arrivalDateTime", booking.getArrivalDateTime() != null ? booking.getArrivalDateTime().toString() : "");
             data.put("departureDateTime", booking.getDepartureDateTime() != null ? booking.getDepartureDateTime().toString() : "");
-            
+
             // Location Details
             data.put("startLocation", trip.getStartLocation() != null ? trip.getStartLocation() : "");
             data.put("endLocation", trip.getEndLocation() != null ? trip.getEndLocation() : "");
             data.put("pickupLocation", trip.getStartLocation() != null ? trip.getStartLocation() : ""); // Alternative field name
             data.put("dropoffLocation", trip.getEndLocation() != null ? trip.getEndLocation() : ""); // Alternative field name
-            
+
             // All Destinations (Drop Locations)
             data.put("destinations", destinationsString);
             data.put("dropLocations", destinationsString); // Alternative field name
@@ -495,7 +495,7 @@ public class BookingService {
                     data.put("destination" + (i + 1), destinations.get(i));
                 }
             }
-            
+
             // Date Information
             data.put("startDate", trip.getStartDateTime() != null ? trip.getStartDateTime().toString() : "");
             data.put("endDate", trip.getEndDateTime() != null ? trip.getEndDateTime().toString() : "");
@@ -503,28 +503,28 @@ public class BookingService {
             data.put("tripEndDate", trip.getEndDateTime() != null ? trip.getEndDateTime().toLocalDate().toString() : "");
             data.put("tripStartDateTime", trip.getStartDateTime() != null ? trip.getStartDateTime().toString() : "");
             data.put("tripEndDateTime", trip.getEndDateTime() != null ? trip.getEndDateTime().toString() : "");
-            
+
             // Duration
             data.put("duration", trip.getDuration() != null ? String.valueOf(trip.getDuration()) : "0");
             data.put("durationMinutes", trip.getDuration() != null ? String.valueOf(trip.getDuration()) : "0");
-            
+
             // Cost Information
             data.put("estimatedCost", trip.getEstimatedCost() != null ? trip.getEstimatedCost().toString() : "0");
             data.put("fare", trip.getEstimatedCost() != null ? trip.getEstimatedCost().toString() : "0"); // Alternative field name
             data.put("bookingPrice", trip.getEstimatedCost() != null ? trip.getEstimatedCost().toString() : "0");
             data.put("cost", trip.getEstimatedCost() != null ? trip.getEstimatedCost().toString() : "0");
-            
+
             // Distance
             data.put("distance", trip.getDistance() != null ? String.valueOf(trip.getDistance()) : "0");
             data.put("distanceKm", trip.getDistance() != null ? String.valueOf(trip.getDistance()) : "0");
-            
+
             // Additional Booking Info
             data.put("status", booking.getStatus() != null ? booking.getStatus() : "");
             data.put("createdAt", booking.getDateCreated() != null ? booking.getDateCreated().toString() : "");
             data.put("touristId", String.valueOf(booking.getTouristId()));
             data.put("tripId", String.valueOf(booking.getTripId()));
             data.put("vehicleId", booking.getVehicleId() != null ? String.valueOf(booking.getVehicleId()) : "");
-            
+
             notification.setData(data);
 
             System.out.println("📤 Sending notification to driver " + booking.getDriverId() + " for booking " + booking.getBookingId());
@@ -575,6 +575,12 @@ public class BookingService {
 
         bookingRepository.save(booking);
 
+        messagingTemplate.convertAndSend(
+                "/topic/confirmed-booking",
+                   1
+
+        );
+
         return new ActionResponse(
                 true,
                 "Tour confirmed successfully."
@@ -618,7 +624,9 @@ public class BookingService {
     public List<BookingSystemResponseDto> getConfirmedBookings() {
 
         // Fetch NEW bookings
-        List<Booking> bookings = bookingRepository.findByStatus("CONFIRMED");
+        List<Booking> bookings = bookingRepository
+                .findByStatus("CONFIRMED");
+
 
         //Map entity list → DTO list
         List<BookingSystemResponseDto> dtoList =
@@ -654,7 +662,8 @@ public class BookingService {
     public List<BookingSystemResponseDto> getDriverConfirmedBookings() {
 
         // Fetch NEW bookings
-        List<Booking> bookings = bookingRepository.findByIsDriverConfirm(true);
+        List<Booking> bookings = bookingRepository
+                .findByStatus("DRIVER_CONFIRMED");
 
         //Map entity list → DTO list
         List<BookingSystemResponseDto> dtoList =
@@ -687,6 +696,119 @@ public class BookingService {
         return dtoList;
     }
 
+
+    public List<BookingSystemResponseDto> getCancledBookings() {
+        // Fetch NEW bookings
+        List<Booking> bookings = bookingRepository
+                .findByStatus("CANCELLED");
+
+
+        //Map entity list → DTO list
+        List<BookingSystemResponseDto> dtoList =
+                modelMapper.map(
+                        bookings,
+                        new TypeToken<List<BookingSystemResponseDto>>() {}.getType()
+                );
+
+        //  Enrich DTOs with derived & missing fields
+        for (int i = 0; i < bookings.size(); i++) {
+
+            Booking booking = bookings.get(i);
+            BookingSystemResponseDto dto = dtoList.get(i);
+
+            // FIX: manually map createdAt
+            dto.setCreatedAt(booking.getDateCreated());
+
+            //Route
+            dto.setRoute(
+                    routeRepository.findWayPointsByTripId(booking.getTripId())
+            );
+
+            // Trip dates
+            tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+                dto.setStartDate(trip.getStartDateTime());
+                dto.setEndDate(trip.getEndDateTime());
+            });
+        }
+
+        return dtoList;
+    }
+
+    public List<BookingSystemResponseDto> getStartedBookings() {
+        // Fetch NEW bookings
+        List<Booking> bookings = bookingRepository
+                .findByStatus("STARTED");
+
+
+        //Map entity list → DTO list
+        List<BookingSystemResponseDto> dtoList =
+                modelMapper.map(
+                        bookings,
+                        new TypeToken<List<BookingSystemResponseDto>>() {}.getType()
+                );
+
+        //  Enrich DTOs with derived & missing fields
+        for (int i = 0; i < bookings.size(); i++) {
+
+            Booking booking = bookings.get(i);
+            BookingSystemResponseDto dto = dtoList.get(i);
+
+            // FIX: manually map createdAt
+            dto.setCreatedAt(booking.getDateCreated());
+
+            //Route
+            dto.setRoute(
+                    routeRepository.findWayPointsByTripId(booking.getTripId())
+            );
+
+            // Trip dates
+            tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+                dto.setStartDate(trip.getStartDateTime());
+                dto.setEndDate(trip.getEndDateTime());
+            });
+        }
+
+        return dtoList;
+    }
+
+    public List<BookingSystemResponseDto> getFinishedBookings() {
+
+            List<Booking> bookings = bookingRepository
+                    .findByStatus("FINISHED");
+
+
+            //Map entity list → DTO list
+            List<BookingSystemResponseDto> dtoList =
+                    modelMapper.map(
+                            bookings,
+                            new TypeToken<List<BookingSystemResponseDto>>() {}.getType()
+                    );
+
+            //  Enrich DTOs with derived & missing fields
+            for (int i = 0; i < bookings.size(); i++) {
+
+                Booking booking = bookings.get(i);
+                BookingSystemResponseDto dto = dtoList.get(i);
+
+                // FIX: manually map createdAt
+                dto.setCreatedAt(booking.getDateCreated());
+
+                //Route
+                dto.setRoute(
+                        routeRepository.findWayPointsByTripId(booking.getTripId())
+                );
+
+                // Trip dates
+                tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
+                    dto.setStartDate(trip.getStartDateTime());
+                    dto.setEndDate(trip.getEndDateTime());
+                });
+            }
+
+
+        return dtoList;
+    }
+
     public List<BookingSystemResponseDto> getBookingsByDriverId(Long driverId) {
         // Fetch bookings for specific driver
         List<Booking> bookings = bookingRepository.findByDriverId(driverId.intValue());
@@ -711,6 +833,117 @@ public class BookingService {
             });
         }
         return dtoList;
+    }
+
+    @Transactional
+    public BookingResponseDto editBooking(Long id,BookingRequestDto dto) {
+
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Booking not found"));
+
+        Trip trip = tripRepository.findById(booking.getTripId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Trip not found"));
+
+    /* =========================
+       UPDATE TRIP
+    ========================= */
+
+        trip.setStartDateTime(dto.getTripDetails().getStartDate().atStartOfDay());
+        trip.setEndDateTime(dto.getTripDetails().getEndDate().atStartOfDay());
+        trip.setEstimatedCost(BigDecimal.valueOf(dto.getRouteDetails().getBookingPrice()));
+        trip.setDistance(dto.getRouteDetails().getDistance());
+        trip.setDuration(dto.getRouteDetails().getDuration());
+        trip.setStartLocation(dto.getTripDetails().getStartLocation());
+        trip.setEndLocation(dto.getTripDetails().getEndLocation());
+
+        tripRepository.save(trip);
+
+    /* =========================
+       UPDATE ROUTES
+       (Delete + Reinsert)
+    ========================= */
+
+        routeRepository.deleteByTripId(trip.getTripId());
+
+        for (String destination : dto.getTripDetails().getDestinations()) {
+            Route route = new Route();
+            route.setTripId(trip.getTripId());
+            route.setWayPoint(destination);
+            routeRepository.save(route);
+        }
+
+    /* =========================
+       UPDATE BOOKING DETAILS
+    ========================= */
+
+        booking.setBookerName(dto.getBookingDetails().getNameOfBooker());
+        booking.setBookerEmail(dto.getBookingDetails().getBookerEmail());
+        booking.setBookerPhone(dto.getBookingDetails().getBookerPhone());
+        booking.setPassportNumber(dto.getBookingDetails().getPassportNumber());
+
+        booking.setAdults(dto.getBookingDetails().getPassengers().getAdults());
+        booking.setChildren(dto.getBookingDetails().getPassengers().getChildren());
+        booking.setBabies(dto.getBookingDetails().getPassengers().getBabies());
+
+        booking.setArrivalDateTime(dto.getBookingDetails().getArrivalDateTime());
+        booking.setDepartureDateTime(dto.getBookingDetails().getDepartureDateTime());
+        booking.setFlightNumber(dto.getBookingDetails().getFlightNumber());
+        booking.setDepartureAirport(dto.getBookingDetails().getDepartureAirport());
+
+    /* =========================
+       UPDATE RESOURCES
+    ========================= */
+
+        booking.setVehicleId(
+                dto.getResources().getVehicle() != null
+                        ? dto.getResources().getVehicle().getVehicleId().intValue()
+                        : null
+        );
+
+        booking.setDriverId(
+                dto.getResources().getDriver() != null
+                        ? dto.getResources().getDriver().getDriverId().intValue()
+                        : null
+        );
+
+    /* =========================
+       STATUS FLAGS (OPTIONAL)
+    ========================= */
+
+        // If resources change, reset confirmations
+        booking.setIsDriverConfirm(false);
+        booking.setSendConfirmEmail(false);
+
+        Booking updatedBooking = bookingRepository.save(booking);
+
+    /* =========================
+       RESPONSE DTO
+    ========================= */
+
+        BookingResponseDto response = new BookingResponseDto();
+        response.setBookingId(updatedBooking.getBookingId());
+        response.setTripId(trip.getTripId());
+        response.setCustomerName(updatedBooking.getBookerName());
+        response.setRoute(dto.getTripDetails().getDestinations());
+        response.setStartDate(trip.getStartDateTime());
+        response.setEndDate(trip.getEndDateTime());
+        response.setTouristId(updatedBooking.getTouristId());
+        response.setStatus(updatedBooking.getStatus());
+        response.setCreatedAt(updatedBooking.getDateCreated());
+        response.setReferenceId(updatedBooking.getReferenceId());
+
+    /* =========================
+       WEBSOCKET UPDATE (OPTIONAL)
+    ========================= */
+
+//        messagingTemplate.convertAndSend(
+//                "/topic/new-tour-update",
+//                response
+//        );
+
+        return response;
     }
 
 }

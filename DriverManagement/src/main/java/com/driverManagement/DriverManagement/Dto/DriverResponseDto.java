@@ -38,7 +38,7 @@ public class DriverResponseDto {
 
     private String licensePdfUrl;
 
-    private int isApproved;
+    private boolean isApproved;
 
     private String status;
 

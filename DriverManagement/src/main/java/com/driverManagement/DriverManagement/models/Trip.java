@@ -1,4 +1,4 @@
-package com.BookingService.BookingService.model;
+package com.driverManagement.DriverManagement.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,8 +39,18 @@ public class Trip {
     @Column(name = "end_location")
     private String endLocation;
 
+    private boolean isTourStart;
+
+    private LocalDateTime tourStartDateTime;
+
+    private boolean isTourEnd ;
+
+    private LocalDateTime tourEndDateTime;
+
     // 🔐 OTP fields
     private String startOtp;
     private LocalDateTime otpExpiry;
-    private boolean otpVerified=false;
+    private boolean otpVerified;
+
+
 }

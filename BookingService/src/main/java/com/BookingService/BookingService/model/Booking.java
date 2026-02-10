@@ -135,4 +135,6 @@ public class Booking {
 
     @Column(name = "date_created", nullable = false)
     private LocalDateTime dateCreated;
+
+
 }

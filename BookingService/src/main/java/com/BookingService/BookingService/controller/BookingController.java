@@ -112,6 +112,22 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/editBooking/{id}")
+    public ResponseEntity<BookingResponseDto> editBooking(
+            @PathVariable Long id,
+            @RequestBody BookingRequestDto dto
+    ) {
+        BookingResponseDto booking = bookingService.editBooking(id,dto);
+        return new ResponseEntity<>(booking, HttpStatus.CREATED);
+    }
+//    public void editBooking(
+//            @PathVariable Long id,
+//            @RequestBody BookingRequestDto dto
+//    ) {
+//        System.out.println(id);
+////        BookingResponseDto booking = bookingService.editBooking(id,dto);
+////        return new ResponseEntity<>(booking, HttpStatus.CREATED);
+//    }
     @GetMapping("get_bookings_by_driver/{driverId}")
     public ResponseEntity<List<BookingSystemResponseDto>> getBookingsByDriver(@PathVariable Long driverId) {
         List<BookingSystemResponseDto> bookings = bookingService.getBookingsByDriverId(driverId);
