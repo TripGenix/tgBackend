@@ -1,20 +1,22 @@
 package com.driverManagement.DriverManagement.services;
 
+import com.driverManagement.DriverManagement.Dto.DriverBlockDateDto;
 import com.driverManagement.DriverManagement.Dto.DriverResponseDto;
 import com.driverManagement.DriverManagement.Dto.DriverSaveDto;
 import com.driverManagement.DriverManagement.Dto.DriverUpdateDto;
 import com.driverManagement.DriverManagement.models.Driver;
+import com.driverManagement.DriverManagement.models.DriverBlockedDate;
+import com.driverManagement.DriverManagement.repository.DriverBlockedDateRepository;
 import com.driverManagement.DriverManagement.repository.DriverRepository;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DriverService {
@@ -24,6 +26,45 @@ public class DriverService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private DriverBlockedDateRepository blockedDateRepository;
+    @Transactional
+    public String blockDriverDates(DriverBlockDateDto dto) {
+        Driver driver = driverRepository.findById(dto.getDriverId())
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        int addedCount = 0;
+
+        if (dto.getBlockedDates() != null) {
+            for (LocalDate date : dto.getBlockedDates()) {
+                // Check if date already exists to avoid duplicates
+                if (!blockedDateRepository.existsByDriver_DriverIdAndBlockedDate(dto.getDriverId(), date)) {
+                    DriverBlockedDate blockedDate = new DriverBlockedDate();
+                    blockedDate.setDriver(driver);
+                    blockedDate.setBlockedDate(date);
+                    blockedDate.setReason("Unavailable"); // Default reason
+                    blockedDateRepository.save(blockedDate);
+                    addedCount++;
+                }
+            }
+        }
+        return addedCount + " dates blocked successfully.";
+    }
+
+    public List<LocalDate> getDriverBlockedDates(int driverId) {
+        List<DriverBlockedDate> entities = blockedDateRepository.findByDriver_DriverId(driverId);
+        List<LocalDate> dates = new ArrayList<>();
+        for (DriverBlockedDate entity : entities) {
+            dates.add(entity.getBlockedDate());
+        }
+        return dates;
+    }
+
+    @Transactional
+    public void clearBlockedDates(int driverId, LocalDate startDate, LocalDate endDate) {
+        blockedDateRepository.deleteByDriverAndDateRange(driverId, startDate, endDate);
+    }
 
     @Transactional
     public DriverResponseDto saveDriver(DriverSaveDto dto) {
@@ -139,6 +180,22 @@ public class DriverService {
 
         driver.setIsDelete(true);
         driverRepository.save(driver);
+    }
+
+    @Transactional
+    public void updateFCMToken(int driverId, String fcmToken) {
+        Driver driver = driverRepository.findById(driverId)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        driver.setFcmToken(fcmToken);
+        driverRepository.save(driver);
+    }
+
+    public String getFCMToken(int driverId) {
+        Driver driver = driverRepository.findById(driverId)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        return driver.getFcmToken();
     }
 
     public ResponseEntity<Driver> approveDriver(int driverId) {

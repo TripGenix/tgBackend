@@ -28,7 +28,7 @@ public class TourController {
         return tourService.getcancledBookings(driverId);
     }
 
-    @PostMapping("/confirm-tour/{tourId}")
+    @PostMapping("/confirm-tours/{tourId}")
     public TourStatusUpdateDto confirmTour(@PathVariable int tourId) {
         return tourService.confirmTour(tourId);
     }

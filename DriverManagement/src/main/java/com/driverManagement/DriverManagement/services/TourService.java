@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -91,7 +90,7 @@ public class TourService {
         }
 
         messagingTemplate.convertAndSend(
-                "/topic/driver-confirm",
+                "/topic/tour-updates",
                 new TourStatusUpdateDto(tourId, "CONFIRMED")
         );
         return new TourStatusUpdateDto(tourId, "CONFIRMED");
