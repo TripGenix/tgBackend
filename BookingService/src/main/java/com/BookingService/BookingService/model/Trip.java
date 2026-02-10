@@ -31,6 +31,9 @@ public class Trip {
     @Column(name = "`estimated_cost`")
     private BigDecimal estimatedCost;
 
+    @Column(name="`total_cost`")
+    private BigDecimal totalCost;
+
     private String status;
 
     private Double duration;

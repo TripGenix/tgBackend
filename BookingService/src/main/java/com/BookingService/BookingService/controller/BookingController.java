@@ -47,24 +47,6 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
-    @GetMapping("get_cancled_bookings")
-    public ResponseEntity<List<BookingSystemResponseDto>> cancledBooking() {
-        List<BookingSystemResponseDto> bookings = bookingService.getCancledBookings();
-        return ResponseEntity.ok(bookings);
-    }
-
-    @GetMapping("get_started_bookings")
-    public ResponseEntity<List<BookingSystemResponseDto>> startedBooking() {
-        List<BookingSystemResponseDto> bookings = bookingService.getStartedBookings();
-        return ResponseEntity.ok(bookings);
-    }
-
-    @GetMapping("get_finished_bookings")
-    public ResponseEntity<List<BookingSystemResponseDto>> finishedBookings() {
-        List<BookingSystemResponseDto> bookings = bookingService.getFinishedBookings();
-        return ResponseEntity.ok(bookings);
-    }
-
     @GetMapping("get_driver_confirmed_bookings")
     public ResponseEntity<List<BookingSystemResponseDto>> driverConfirmedBooking() {
         List<BookingSystemResponseDto> bookings = bookingService.getDriverConfirmedBookings();
@@ -130,7 +112,32 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/editBooking/{id}")
+    public ResponseEntity<BookingResponseDto> editBooking(
+            @PathVariable Long id,
+            @RequestBody BookingRequestDto dto
+    ) {
+        BookingResponseDto booking = bookingService.editBooking(id,dto);
+        return new ResponseEntity<>(booking, HttpStatus.CREATED);
+    }
+//    public void editBooking(
+//            @PathVariable Long id,
+//            @RequestBody BookingRequestDto dto
+//    ) {
+//        System.out.println(id);
+////        BookingResponseDto booking = bookingService.editBooking(id,dto);
+////        return new ResponseEntity<>(booking, HttpStatus.CREATED);
+//    }
+    @GetMapping("get_bookings_by_driver/{driverId}")
+    public ResponseEntity<List<BookingSystemResponseDto>> getBookingsByDriver(@PathVariable Long driverId) {
+        List<BookingSystemResponseDto> bookings = bookingService.getBookingsByDriverId(driverId);
+        return ResponseEntity.ok(bookings);
+    }
 
 
+    @PostMapping("/confirm-by-admin/{bookingId}")
+    public ResponseEntity<ActionResponse> confirmByTripgenix(@PathVariable Long bookingId) {
+        return bookingService.confirmByAdmin(bookingId);
+    }
 
 }

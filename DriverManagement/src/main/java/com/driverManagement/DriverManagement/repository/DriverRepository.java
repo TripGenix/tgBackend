@@ -59,4 +59,6 @@ public interface DriverRepository extends JpaRepository<Driver, Integer> {
     )
     List<Driver> findByApproved(@Param("b") boolean b);
 
+    Optional<Driver> findByEmail(String email);
+
 }

@@ -25,10 +25,13 @@ public class Payment {
     private Long bookingId;
 
     @Column(nullable = false)
-    private BigDecimal amount;
+    private BigDecimal paidAmount;
+
+    @Column(name="balance")
+    private BigDecimal balance;
 
     @Column(nullable = false)
-    private String status;   // PAID, FAILED, CANCELLED, PENDING
+    private String status;   // PAID, ADVANCED, CANCELLED, PENDING
 
     private String paymentType; // CARD, PAYHERE, CASH
 

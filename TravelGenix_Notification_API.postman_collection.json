@@ -1,0 +1,269 @@
+{
+	"info": {
+		"name": "TravelGenix - Booking Notification API",
+		"description": "Postman collection for testing booking notification system",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Create Booking with Driver (Triggers Notification)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user\": {\n    \"userId\": 1,\n    \"role\": \"TOURIST\"\n  },\n  \"bookingDetails\": {\n    \"nameOfBooker\": \"John Doe\",\n    \"passportNumber\": \"AB123456\",\n    \"bookerEmail\": \"john.doe@example.com\",\n    \"bookerPhone\": \"+1234567890\",\n    \"arrivalDateTime\": \"2024-12-15T10:00:00\",\n    \"departureDateTime\": \"2024-12-20T18:00:00\",\n    \"flightNumber\": \"AA123\",\n    \"departureAirport\": \"JFK\",\n    \"passengers\": {\n      \"adults\": 2,\n      \"children\": 1,\n      \"babies\": 0\n    }\n  },\n  \"tripDetails\": {\n    \"startLocation\": \"Colombo Airport\",\n    \"endLocation\": \"Galle Fort\",\n    \"startDate\": \"2024-12-15\",\n    \"endDate\": \"2024-12-20\",\n    \"isVehicle\": true,\n    \"destinations\": [\n      \"Kandy\",\n      \"Nuwara Eliya\"\n    ]\n  },\n  \"routeDetails\": {\n    \"distance\": 150.5,\n    \"duration\": 180.0,\n    \"polyline\": \"\",\n    \"costPerKm\": 2.5,\n    \"bookingPrice\": 375.0\n  },\n  \"resources\": {\n    \"vehicle\": {\n      \"vehicleId\": 1,\n      \"vehicleNumber\": \"ABC-1234\",\n      \"vehicleType\": \"Sedan\",\n      \"capacity\": 4\n    },\n    \"driver\": {\n      \"driverId\": 1,\n      \"firstName\": \"Driver\",\n      \"lastName\": \"Name\",\n      \"phone\": \"+1234567890\"\n    },\n    \"guide\": null,\n    \"hotel\": null\n  },\n  \"metadata\": {\n    \"createdAt\": \"2024-12-01T10:00:00\",\n    \"source\": \"SYSTEM\",\n    \"packageId\": 1\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8087/bookingservice/api/v1/saveBooking",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8087",
+					"path": [
+						"bookingservice",
+						"api",
+						"v1",
+						"saveBooking"
+					]
+				},
+				"description": "Creates a booking with a driver assigned. This automatically triggers a notification to the driver via WebSocket and FCM."
+			}
+		},
+		{
+			"name": "2. Send Notification Directly",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"type\": \"NEW_BOOKING\",\n  \"title\": \"New Ride Request\",\n  \"message\": \"You have received a new ride request: TG-CP-20241201-123\",\n  \"bookingId\": 123,\n  \"driverId\": 1,\n  \"data\": {\n    \"referenceId\": \"TG-CP-20241201-123\",\n    \"bookerName\": \"John Doe\",\n    \"bookerPhone\": \"+1234567890\",\n    \"startLocation\": \"Colombo Airport\",\n    \"endLocation\": \"Galle Fort\",\n    \"startDate\": \"2024-12-15T10:00:00\",\n    \"endDate\": \"2024-12-20T18:00:00\",\n    \"estimatedCost\": \"375.00\",\n    \"distance\": \"150.5\",\n    \"duration\": \"180.0\"\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8089/notification/api/v1/notify-driver/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8089",
+					"path": [
+						"notification",
+						"api",
+						"v1",
+						"notify-driver",
+						"1"
+					]
+				},
+				"description": "Sends a notification directly to a driver without creating a booking. Replace '1' in the URL with the actual driverId."
+			}
+		},
+		{
+			"name": "3. Test WebSocket Notification",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8089/notification/api/v1/test-websocket/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8089",
+					"path": [
+						"notification",
+						"api",
+						"v1",
+						"test-websocket",
+						"1"
+					]
+				},
+				"description": "Sends a test WebSocket notification. Requires a WebSocket client connected to ws://localhost:8089/ws subscribed to /topic/driver/1"
+			}
+		},
+		{
+			"name": "4. Send FCM Push Notification",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"fcmToken\": \"YOUR_FCM_TOKEN_HERE\",\n  \"title\": \"New Ride Request\",\n  \"body\": \"You have received a new ride request: TG-CP-20241201-123\",\n  \"data\": {\n    \"type\": \"NEW_BOOKING\",\n    \"bookingId\": \"123\",\n    \"driverId\": \"1\",\n    \"referenceId\": \"TG-CP-20241201-123\"\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8089/notification/api/v1/send-fcm",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8089",
+					"path": [
+						"notification",
+						"api",
+						"v1",
+						"send-fcm"
+					]
+				},
+				"description": "Sends an FCM push notification directly. Replace YOUR_FCM_TOKEN_HERE with a valid FCM token from your Flutter app."
+			}
+		},
+		{
+			"name": "5. Update Driver FCM Token",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"fcmToken\": \"YOUR_FCM_TOKEN_HERE\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/driveController/api/v1/1/fcm-token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"driveController",
+						"api",
+						"v1",
+						"1",
+						"fcm-token"
+					]
+				},
+				"description": "Updates a driver's FCM token. Replace '1' in the URL with the actual driverId and YOUR_FCM_TOKEN_HERE with the FCM token from Flutter app."
+			}
+		},
+		{
+			"name": "6. Get Driver FCM Token",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/driveController/api/v1/1/fcm-token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"driveController",
+						"api",
+						"v1",
+						"1",
+						"fcm-token"
+					]
+				},
+				"description": "Retrieves a driver's FCM token. Replace '1' in the URL with the actual driverId."
+			}
+		},
+		{
+			"name": "7. Get Booking by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8087/bookingservice/api/v1/get_booking_by_id/123",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8087",
+					"path": [
+						"bookingservice",
+						"api",
+						"v1",
+						"get_booking_by_id",
+						"123"
+					]
+				},
+				"description": "Retrieves booking details by ID. Replace '123' with the actual bookingId from the create booking response."
+			}
+		},
+		{
+			"name": "8. Get All Bookings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8087/bookingservice/api/v1/get_all_bookings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8087",
+					"path": [
+						"bookingservice",
+						"api",
+						"v1",
+						"get_all_bookings"
+					]
+				},
+				"description": "Retrieves all bookings from the system."
+			}
+		},
+		{
+			"name": "9. Get New Bookings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8087/bookingservice/api/v1/get_new_bookings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8087",
+					"path": [
+						"bookingservice",
+						"api",
+						"v1",
+						"get_new_bookings"
+					]
+				},
+				"description": "Retrieves all bookings with status 'NEW'."
+			}
+		}
+	]
+}
+
