@@ -53,6 +53,18 @@ public class TourGuideController {
         }
     }
 
+    @PutMapping("/update-tour-guide")
+    public ResponseEntity<String> update(@RequestBody TourGuideDTO dto) {
+        try {
+            String result = service.updateGuide(dto);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error updating guide: " + e.getMessage());
+        }
+    }
+
+
     @DeleteMapping("/delete/{tourId}")
     public ResponseEntity<String> delete(@PathVariable Long tourId) {
         try {

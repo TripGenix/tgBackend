@@ -58,4 +58,28 @@ public class TourGuideService {
                 g.getDriver()
         );
     }
+
+    public String updateGuide(TourGuideDTO dto) {
+
+        if (dto.getTourGuideId() == null) {
+            throw new RuntimeException("Tour guide ID is required for update");
+        }
+
+        TourGuide guide = repo.findById(dto.getTourGuideId())
+                .orElseThrow(() -> new RuntimeException("Guide not found"));
+
+        // update fields
+        guide.setLanguage(dto.getLanguage());
+        guide.setReviewId(dto.getReviewId());
+        guide.setImage(dto.getImage());
+        guide.setName(dto.getName());
+        guide.setStatus(dto.isStatus());
+        guide.setNic(dto.getNic());
+        guide.setDriver(dto.getDriver());
+
+        repo.save(guide);
+
+        return "Guide updated successfully";
+    }
+
 }
