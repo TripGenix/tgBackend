@@ -26,6 +26,7 @@ public class TourGuideService {
         g.setStatus(dto.isStatus());
         g.setNic(dto.getNic());
         g.setDriver(dto.getDriver());
+        g.setHourlyRate(dto.getHourlyRate());
 
         repo.save(g);
         return g.getName();
@@ -55,8 +56,8 @@ public class TourGuideService {
                 g.getName(),
                 g.isStatus(),
                 g.getNic(),
-                g.getDriver()
-        );
+                g.getDriver(),
+                g.getHourlyRate());
     }
 
     public String updateGuide(TourGuideDTO dto) {
@@ -76,6 +77,7 @@ public class TourGuideService {
         guide.setStatus(dto.isStatus());
         guide.setNic(dto.getNic());
         guide.setDriver(dto.getDriver());
+        guide.setHourlyRate(dto.getHourlyRate());
 
         repo.save(guide);
 
