@@ -32,4 +32,15 @@ public class Booking {
 
     @Column(name = "driver_cancelled_at")
     private LocalDateTime driverCancelledAt;
+
+    @Column(name = "trip_id")
+    private Long tripId;
+
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    @Column(name = "tourist_id", nullable = false)
+    private Long touristId;
+
+
 }

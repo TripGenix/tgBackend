@@ -12,4 +12,6 @@ import java.util.List;
 public interface RouteRepository  extends JpaRepository<Route, Long> {
     @Query("SELECT r.wayPoint FROM Route r WHERE r.tripId = :tripId")
     List<String> findWayPointsByTripId(@Param("tripId") Long tripId);
+
+    void deleteByTripId(Long tripId);
 }

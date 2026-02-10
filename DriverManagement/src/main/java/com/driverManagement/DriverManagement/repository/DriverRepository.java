@@ -5,6 +5,7 @@ import com.driverManagement.DriverManagement.models.Driver;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -51,6 +52,12 @@ public interface DriverRepository extends JpaRepository<Driver, Integer> {
     @Modifying
     @Query(value = "DELETE FROM driver_allocated_vehicle_category WHERE driver_id = :driverId", nativeQuery = true)
     void deleteAllocatedCategories(int driverId);
+
+    @Query(
+            value = "SELECT * FROM drivers WHERE is_delete = false AND is_approved = :b",
+            nativeQuery = true
+    )
+    List<Driver> findByApproved(@Param("b") boolean b);
 
     Optional<Driver> findByEmail(String email);
 
