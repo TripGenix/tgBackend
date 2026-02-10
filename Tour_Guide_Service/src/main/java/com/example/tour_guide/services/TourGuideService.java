@@ -5,73 +5,81 @@ import com.example.tour_guide.model.TourGuide;
 import com.example.tour_guide.repositories.TourGuideRepo;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TourGuideService {
-    private final TourGuideRepo tourGuideRepo;
 
-    public TourGuideService(TourGuideRepo tourGuideRepo) {
-        this.tourGuideRepo = tourGuideRepo;
+    private final TourGuideRepo repo;
+
+    public TourGuideService(TourGuideRepo repo) {
+        this.repo = repo;
     }
 
-    public String createGuide(TourGuideDTO tourGuideDTO) {
-        System.out.println("createGuide tourGuideDTO = " + tourGuideDTO);
-        TourGuide tourGuide = new TourGuide();
-        tourGuide.setName(tourGuideDTO.getName());
+    public String createGuide(TourGuideDTO dto) {
+        TourGuide g = new TourGuide();
+        g.setLanguage(dto.getLanguage());
+        g.setReviewId(dto.getReviewId());
+        g.setImage(dto.getImage());
+        g.setName(dto.getName());
+        g.setStatus(dto.isStatus());
+        g.setNic(dto.getNic());
+        g.setDriver(dto.getDriver());
 
-        tourGuide.setLanguage(tourGuideDTO.getLanguage());
-        tourGuide.setReviewId(tourGuideDTO.getReviewId());
-        tourGuide.setImage(tourGuideDTO.getImage());
-        tourGuide.setStatus(tourGuideDTO.isStatus());
-        tourGuide.setNic(tourGuideDTO.getNic());
-        tourGuide.setDriver(tourGuideDTO.isDriver());
-        tourGuideRepo.save(tourGuide);
-        return tourGuideDTO.getName();
-    }
-
-
-    public TourGuideDTO searchGuide(Long tourId) {
-        if(tourGuideRepo.existsById(tourId)){
-            TourGuide tourGuide=tourGuideRepo.getReferenceById(tourId);
-            TourGuideDTO tourGuideDTO=new TourGuideDTO(
-                    tourGuide.getLanguage(),
-                    tourGuide.getReviewId(),
-                    tourGuide.getImage(),
-                    tourGuide.getName(),
-                    tourGuide.isStatus(),
-                    tourGuide.getNic(),
-                    tourGuide.isDriver()
-            );
-            return tourGuideDTO;
-        }else{
-            System.out.println("There is not exists tourGuide");
-            return null;
-        }
+        repo.save(g);
+        return g.getName();
     }
 
     public List<TourGuideDTO> getAllTourGuides() {
-        List<TourGuide> getAllGuides = tourGuideRepo.findAll();
-        List<TourGuideDTO> allTourGuideDTOS=new ArrayList<>();
+        return repo.findAll()
+                .stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
 
-        for(TourGuide tourGuide:getAllGuides){
-            TourGuideDTO tourGuideDTO=new TourGuideDTO(
-                    tourGuide.getLanguage(),
-                    tourGuide.getReviewId(),
-                    tourGuide.getImage(),
-                    tourGuide.getName(),
-                    tourGuide.isStatus(),
-                    tourGuide.getNic(),
-                    tourGuide.isDriver()
-            );
-            allTourGuideDTOS.add(tourGuideDTO);
+    public TourGuideDTO searchGuide(Long id) {
+        return repo.findById(id).map(this::map).orElse(null);
+    }
+
+    public void deleteGuide(Long id) {
+        repo.deleteById(id);
+    }
+
+    private TourGuideDTO map(TourGuide g) {
+        return new TourGuideDTO(
+                g.getTourGuideId(),
+                g.getLanguage(),
+                g.getReviewId(),
+                g.getImage(),
+                g.getName(),
+                g.isStatus(),
+                g.getNic(),
+                g.getDriver()
+        );
+    }
+
+    public String updateGuide(TourGuideDTO dto) {
+
+        if (dto.getTourGuideId() == null) {
+            throw new RuntimeException("Tour guide ID is required for update");
         }
-        return allTourGuideDTOS;
+
+        TourGuide guide = repo.findById(dto.getTourGuideId())
+                .orElseThrow(() -> new RuntimeException("Guide not found"));
+
+        // update fields
+        guide.setLanguage(dto.getLanguage());
+        guide.setReviewId(dto.getReviewId());
+        guide.setImage(dto.getImage());
+        guide.setName(dto.getName());
+        guide.setStatus(dto.isStatus());
+        guide.setNic(dto.getNic());
+        guide.setDriver(dto.getDriver());
+
+        repo.save(guide);
+
+        return "Guide updated successfully";
     }
 
-    public String deleteGuide(Long tourId) {
-        tourGuideRepo.deleteById(tourId);
-        return tourId + " succesfully deleted";
-    }
 }

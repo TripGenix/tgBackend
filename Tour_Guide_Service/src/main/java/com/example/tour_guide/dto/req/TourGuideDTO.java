@@ -1,18 +1,22 @@
 package com.example.tour_guide.dto.req;
 
-
-
-
 public class TourGuideDTO {
+
+    private Long tourGuideId;
     private String language;
     private int reviewId;
     private String image;
     private String name;
     private boolean status;
     private String nic;
-    private boolean driver;
+    private Integer driver;
 
-    public TourGuideDTO(String language, int reviewId, String image, String name, boolean status, String nic, boolean driver) {
+    public TourGuideDTO() {}
+
+    public TourGuideDTO(Long tourGuideId, String language, int reviewId,
+                        String image, String name, boolean status,
+                        String nic, Integer driver) {
+        this.tourGuideId = tourGuideId;
         this.language = language;
         this.reviewId = reviewId;
         this.image = image;
@@ -22,65 +26,28 @@ public class TourGuideDTO {
         this.driver = driver;
     }
 
-    public TourGuideDTO() {
-    }
+    // getters & setters
+    public Long getTourGuideId() { return tourGuideId; }
+    public void setTourGuideId(Long tourGuideId) { this.tourGuideId = tourGuideId; }
 
-    public String getLanguage() {
-        return language;
-    }
+    public String getLanguage() { return language; }
+    public void setLanguage(String language) { this.language = language; }
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
+    public int getReviewId() { return reviewId; }
+    public void setReviewId(int reviewId) { this.reviewId = reviewId; }
 
-    public int getReviewId() {
-        return reviewId;
-    }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 
-    public void setReviewId(int reviewId) {
-        this.reviewId = reviewId;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getImage() {
-        return image;
-    }
+    public boolean isStatus() { return status; }
+    public void setStatus(boolean status) { this.status = status; }
 
-    public void setImage(String image) {
-        this.image = image;
-    }
+    public String getNic() { return nic; }
+    public void setNic(String nic) { this.nic = nic; }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public String getNic() {
-        return nic;
-    }
-
-    public void setNic(String nic) {
-        this.nic = nic;
-    }
-
-    public boolean isDriver() {
-        return driver;
-    }
-
-    public void setDriver(boolean driver) {
-        this.driver = driver;
-    }
+    public Integer getDriver() { return driver; }
+    public void setDriver(Integer driver) { this.driver = driver; }
 }
-
-
-
