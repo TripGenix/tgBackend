@@ -32,6 +32,11 @@ public class TouristController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    @GetMapping("/test")
+    public String test() {
+        return "test";
+    }
+
     @PostMapping("/register")
     public ResponseEntity<TouristResponseDto> register(@RequestBody TouristDto dto){
         TouristResponseDto response = touristService.saveTourist(dto);
@@ -48,8 +53,9 @@ public class TouristController {
                 )
         );
 
-        Tourist user = touristService.findByEmail(request.getEmail());
 
+        Tourist user = touristService.findByEmail(request.getEmail());
+        System.out.println(user);
         String token = jwtTokenProvider.generateToken(user);
 
         return new LoginResposnseDto(token);

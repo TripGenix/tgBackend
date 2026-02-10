@@ -19,6 +19,9 @@ public class Trip {
     @Column(name = "trip_id")
     private Long tripId;
 
+    @Column(name = "tourist_id")
+    private Long touristId;
+
     @Column(name = "`start_dateTime`")
     private LocalDateTime startDateTime;
 
