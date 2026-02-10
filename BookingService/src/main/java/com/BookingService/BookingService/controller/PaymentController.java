@@ -1,5 +1,6 @@
 package com.BookingService.BookingService.controller;
 
+import com.BookingService.BookingService.dto.PaymentDto;
 import com.BookingService.BookingService.service.InvoiceService;
 import com.BookingService.BookingService.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,6 +48,12 @@ public class PaymentController {
 
 //        System.out.println(request.getRequestURI());
 //        paymentService.handlePayHereNotification(request);
+        return ResponseEntity.ok("OK");
+    }
+
+    @PostMapping("/pay")
+    public ResponseEntity<String> pay(@RequestBody PaymentDto paymentDto) {
+        paymentService.pay(paymentDto);
         return ResponseEntity.ok("OK");
     }
 

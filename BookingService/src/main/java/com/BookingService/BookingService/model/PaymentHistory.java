@@ -9,31 +9,28 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payments",
-        uniqueConstraints = @UniqueConstraint(columnNames = "booking_id"))
+@Table(name = "payment_history")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Payment {
+public class PaymentHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payment_id")
-    private Long paymentId;
+    private Long historyId;
 
-    @Column(name = "booking_id", nullable = false)
+    @Column(nullable = false)
     private Long bookingId;
 
     @Column(nullable = false)
     private BigDecimal paidAmount;
 
-    @Column(name="balance")
-    private BigDecimal balance;
+    @Column(nullable = false)
+    private String paymentType; // CARD, CASH, PAYHERE
 
     @Column(nullable = false)
-    private String status;   // PAID, ADVANCED, CANCELLED, PENDING
+    private LocalDateTime paidDateTime;
 
-    private String paymentType; // CARD, PAYHERE, CASH
-
-    private LocalDateTime paymentDateTime;
+    @Column(nullable = false)
+    private String status; // SUCCESS, FAILED
 }

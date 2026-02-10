@@ -1,18 +1,29 @@
 package com.BookingService.BookingService.EmailTemplates;
 
 import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseById;
-import com.BookingService.BookingService.model.Booking;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Year;
 
 public class EmailTemplateBuilder {
-
 
     public static String buildConfirmationEmail(
             BookingSystemResponseById booking,
             String paymentUrl,
             String cancelUrl
     ) {
+
+        BigDecimal totalCost = BigDecimal.valueOf(booking.getRouteDetails().getBookingPrice());
+
+        // 25% advance payment
+        BigDecimal advancePayment = totalCost
+                .multiply(BigDecimal.valueOf(0.25))
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal balancePayment = totalCost
+                .subtract(advancePayment)
+                .setScale(2, RoundingMode.HALF_UP);
 
         return """
 <!DOCTYPE html>
@@ -75,21 +86,36 @@ public class EmailTemplateBuilder {
                 </tr>
 
                 <tr>
-                  <td><b>Final Tour Cost</b></td>
+                  <td><b>Total Tour Cost</b></td>
                   <td style="font-weight:600; color:#1d4ed8;">
+                    LKR %s
+                  </td>
+                </tr>
+
+                <tr>
+                <td><b>Advance Payment (25%%)</b></td>
+                                                                                    <td style="font-weight:600; color:#16a34a;">
+                    LKR %s
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><b>Remaining Balance</b></td>
+                  <td>
                     LKR %s
                   </td>
                 </tr>
               </table>
 
-              <p style="font-size:14px; color:#374151;">
-                Please review the above details carefully.  
-                If you notice anything that needs clarification or adjustment,
-                feel free to contact us before proceeding.
-              </p>
+             <p style="font-size:14px; color:#b91c1c; font-weight:600;">
+                                    ⚠️ The advance payment of <b>25%%</b> is <u>NON-REFUNDABLE</u> once the booking is confirmed.
+                                  </p>
+                
 
-              <p style="font-size:14px; color:#b91c1c; font-weight:600;">
-                ⏳ Kindly complete your payment within <b>2 days</b> to secure your booking.
+              <p style="font-size:14px; color:#374151;">
+                ⏳ Please complete the advance payment within <b>2 days</b>
+                to secure your booking. The remaining balance can be settled later
+                as per TripGenix policy.
               </p>
 
               <!-- BUTTONS -->
@@ -126,7 +152,7 @@ public class EmailTemplateBuilder {
                      font-size:16px;
                      text-align:center;
                    ">
-                  💳 Make Your Payment
+                  💳 Pay 25%% Advance
                 </a>
 
               </div>
@@ -158,16 +184,18 @@ public class EmailTemplateBuilder {
 </body>
 </html>
 """
-.formatted(
-                booking.getBookingDetails().getNameOfBooker(),
-                booking.getReferenceId(),
-                String.join(" → ", booking.getTripDetails().getDestinations()),
-                booking.getTripDetails().getStartDate(),
-                booking.getTripDetails().getEndDate(),
-                booking.getRouteDetails().getBookingPrice(),
-                cancelUrl,
-                paymentUrl,
-                Year.now().getValue()
-        );
+                .formatted(
+                        booking.getBookingDetails().getNameOfBooker(),
+                        booking.getReferenceId(),
+                        String.join(" → ", booking.getTripDetails().getDestinations()),
+                        booking.getTripDetails().getStartDate(),
+                        booking.getTripDetails().getEndDate(),
+                        totalCost.toPlainString(),
+                        advancePayment.toPlainString(),
+                        balancePayment.toPlainString(),
+                        cancelUrl,
+                        paymentUrl,
+                        Year.now().getValue()
+                );
     }
 }
