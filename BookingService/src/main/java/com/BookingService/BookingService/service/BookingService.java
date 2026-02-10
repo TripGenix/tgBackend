@@ -670,4 +670,116 @@ public class BookingService {
             return dtoList;
 
     }
+
+    @Transactional
+    public BookingResponseDto editBooking(Long id,BookingRequestDto dto) {
+
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Booking not found"));
+
+        Trip trip = tripRepository.findById(booking.getTripId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Trip not found"));
+
+    /* =========================
+       UPDATE TRIP
+    ========================= */
+
+        trip.setStartDateTime(dto.getTripDetails().getStartDate().atStartOfDay());
+        trip.setEndDateTime(dto.getTripDetails().getEndDate().atStartOfDay());
+        trip.setEstimatedCost(BigDecimal.valueOf(dto.getRouteDetails().getBookingPrice()));
+        trip.setDistance(dto.getRouteDetails().getDistance());
+        trip.setDuration(dto.getRouteDetails().getDuration());
+        trip.setStartLocation(dto.getTripDetails().getStartLocation());
+        trip.setEndLocation(dto.getTripDetails().getEndLocation());
+
+        tripRepository.save(trip);
+
+    /* =========================
+       UPDATE ROUTES
+       (Delete + Reinsert)
+    ========================= */
+
+        routeRepository.deleteByTripId(trip.getTripId());
+
+        for (String destination : dto.getTripDetails().getDestinations()) {
+            Route route = new Route();
+            route.setTripId(trip.getTripId());
+            route.setWayPoint(destination);
+            routeRepository.save(route);
+        }
+
+    /* =========================
+       UPDATE BOOKING DETAILS
+    ========================= */
+
+        booking.setBookerName(dto.getBookingDetails().getNameOfBooker());
+        booking.setBookerEmail(dto.getBookingDetails().getBookerEmail());
+        booking.setBookerPhone(dto.getBookingDetails().getBookerPhone());
+        booking.setPassportNumber(dto.getBookingDetails().getPassportNumber());
+
+        booking.setAdults(dto.getBookingDetails().getPassengers().getAdults());
+        booking.setChildren(dto.getBookingDetails().getPassengers().getChildren());
+        booking.setBabies(dto.getBookingDetails().getPassengers().getBabies());
+
+        booking.setArrivalDateTime(dto.getBookingDetails().getArrivalDateTime());
+        booking.setDepartureDateTime(dto.getBookingDetails().getDepartureDateTime());
+        booking.setFlightNumber(dto.getBookingDetails().getFlightNumber());
+        booking.setDepartureAirport(dto.getBookingDetails().getDepartureAirport());
+
+    /* =========================
+       UPDATE RESOURCES
+    ========================= */
+
+        booking.setVehicleId(
+                dto.getResources().getVehicle() != null
+                        ? dto.getResources().getVehicle().getVehicleId().intValue()
+                        : null
+        );
+
+        booking.setDriverId(
+                dto.getResources().getDriver() != null
+                        ? dto.getResources().getDriver().getDriverId().intValue()
+                        : null
+        );
+
+    /* =========================
+       STATUS FLAGS (OPTIONAL)
+    ========================= */
+
+        // If resources change, reset confirmations
+        booking.setIsDriverConfirm(false);
+        booking.setSendConfirmEmail(false);
+
+        Booking updatedBooking = bookingRepository.save(booking);
+
+    /* =========================
+       RESPONSE DTO
+    ========================= */
+
+        BookingResponseDto response = new BookingResponseDto();
+        response.setBookingId(updatedBooking.getBookingId());
+        response.setTripId(trip.getTripId());
+        response.setCustomerName(updatedBooking.getBookerName());
+        response.setRoute(dto.getTripDetails().getDestinations());
+        response.setStartDate(trip.getStartDateTime());
+        response.setEndDate(trip.getEndDateTime());
+        response.setTouristId(updatedBooking.getTouristId());
+        response.setStatus(updatedBooking.getStatus());
+        response.setCreatedAt(updatedBooking.getDateCreated());
+        response.setReferenceId(updatedBooking.getReferenceId());
+
+    /* =========================
+       WEBSOCKET UPDATE (OPTIONAL)
+    ========================= */
+
+//        messagingTemplate.convertAndSend(
+//                "/topic/new-tour-update",
+//                response
+//        );
+
+        return response;
+    }
+
 }
