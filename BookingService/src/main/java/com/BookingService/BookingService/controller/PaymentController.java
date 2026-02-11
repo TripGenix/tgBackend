@@ -1,6 +1,14 @@
 package com.BookingService.BookingService.controller;
 
 import com.BookingService.BookingService.dto.PaymentDto;
+import com.BookingService.BookingService.dto.systemReponse.DriverPaymentsResponseDto;
+import com.BookingService.BookingService.dto.systemReponse.VehiclePaymentsResponseDto;
+import com.BookingService.BookingService.model.CompanyEarn;
+import com.BookingService.BookingService.model.DriverPayments;
+import com.BookingService.BookingService.model.VehiclePayments;
+import com.BookingService.BookingService.repository.CompanyEarnRepository;
+import com.BookingService.BookingService.repository.DriverPaymentsRepository;
+import com.BookingService.BookingService.repository.VehiclePaymentsRepository;
 import com.BookingService.BookingService.service.InvoiceService;
 import com.BookingService.BookingService.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +17,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/paymentcontroller")
@@ -20,6 +30,13 @@ public class PaymentController {
 
     @Autowired
     private InvoiceService invoiceService;
+
+    @Autowired
+    private CompanyEarnRepository companyEarnRepository;
+    @Autowired
+    private DriverPaymentsRepository driverPaymentsRepository;
+    @Autowired
+    private VehiclePaymentsRepository vehiclePaymentsRepository;
 
     @GetMapping("getHash")
     public String getHash(
@@ -56,5 +73,32 @@ public class PaymentController {
         paymentService.pay(paymentDto);
         return ResponseEntity.ok("OK");
     }
+
+
+
+    @GetMapping("/companyEarn")
+    public ResponseEntity<List<CompanyEarn>> getAllCompanyEarn() {
+
+        List<CompanyEarn> earns = companyEarnRepository.findAll();
+
+        return ResponseEntity.ok(earns);
+    }
+
+    @GetMapping("/driver-payments")
+    public ResponseEntity<List<DriverPaymentsResponseDto>> getAllDriverPayments() {
+
+        List<DriverPaymentsResponseDto> DriverPaymentsResponseDto = paymentService.getDriverPayments();
+
+        return ResponseEntity.ok(DriverPaymentsResponseDto);
+    }
+
+    @GetMapping("/vehicel-payments")
+    public ResponseEntity<List<VehiclePaymentsResponseDto>> getAllVehiclePayments() {
+
+        List<VehiclePaymentsResponseDto> payments = paymentService.getVehiclePayments();
+
+        return ResponseEntity.ok(payments);
+    }
+
 
 }
