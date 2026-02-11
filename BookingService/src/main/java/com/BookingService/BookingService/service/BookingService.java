@@ -150,6 +150,7 @@ public class BookingService {
         String referenceId = generateReferenceId(savedBooking.getBookingId());
         savedBooking.setReferenceId(referenceId);
 
+
         bookingRepository.save(savedBooking);
 
 

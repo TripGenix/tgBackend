@@ -1,14 +1,13 @@
 package com.BookingService.BookingService.service;
 
+import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostRequestDto;
+import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostResponse;
 import com.BookingService.BookingService.dto.PaymentDto;
-import com.BookingService.BookingService.model.Booking;
-import com.BookingService.BookingService.model.Payment;
-import com.BookingService.BookingService.model.PaymentHistory;
-import com.BookingService.BookingService.model.Trip;
-import com.BookingService.BookingService.repository.BookingRepository;
-import com.BookingService.BookingService.repository.PaymentHistoryRepository;
-import com.BookingService.BookingService.repository.PaymentRepository;
-import com.BookingService.BookingService.repository.TripRepository;
+import com.BookingService.BookingService.dto.systemReponse.DriverPaymentsResponseDto;
+import com.BookingService.BookingService.dto.systemReponse.VehiclePaymentsResponseDto;
+import com.BookingService.BookingService.model.*;
+import com.BookingService.BookingService.repository.*;
+import com.BookingService.BookingService.service.BusinessModel.BusinessModelSercvice;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +18,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Driver;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class PaymentService {
@@ -36,6 +37,19 @@ public class PaymentService {
 
     @Autowired
     private PaymentHistoryRepository paymentHistoryRepository;
+
+    @Autowired
+    private BusinessModelSercvice businessModelSercvice;
+
+    @Autowired
+    private DriverPaymentsRepository driverPaymentsRepository;
+
+    @Autowired
+    private VehiclePaymentsRepository vehiclePaymentsRepository;
+
+    @Autowired
+    private CompanyEarnRepository companyEarnRepository;
+
 
     private static final String MERCHANT_ID = "1233436";
 
@@ -218,7 +232,85 @@ public class PaymentService {
         history.setStatus("SUCCESS");
 
         paymentHistoryRepository.save(history);
+
+        EstimatedCostRequestDto estimatedCostRequestDto = new EstimatedCostRequestDto();
+
+        estimatedCostRequestDto.setDistance(trip.getDistance());
+        estimatedCostRequestDto.setDriverId(Long.valueOf(booking.getDriverId()));
+        estimatedCostRequestDto.setVehicleId(Long.valueOf(booking.getVehicleId()));
+
+        EstimatedCostResponse ec= businessModelSercvice.calculateEstimatedCost(estimatedCostRequestDto);
+
+        // 6️⃣ DISTRIBUTION SAVE / UPDATE
+
+        // Check if driver payment already exists
+        DriverPayments existingDriverPayment =
+                (DriverPayments) driverPaymentsRepository.findByBookingId(dto.getBookingId())
+                        .orElse(null);
+
+        if (existingDriverPayment == null) {
+
+            // 🔹 FIRST TIME CREATE DISTRIBUTION RECORDS
+
+            String payoutStatus = status.equals("PAID") ? "CONFIRM" : "PENDING";
+
+            // DRIVER
+            DriverPayments driverPayment = new DriverPayments();
+            driverPayment.setBookingId(dto.getBookingId());
+            driverPayment.setPaymentId(payment.getPaymentId());
+            driverPayment.setAmount(ec.getDriverReceives());
+            driverPayment.setStatus(payoutStatus);
+            driverPayment.setPaymentDateTime(LocalDateTime.now());
+            driverPaymentsRepository.save(driverPayment);
+
+            // VEHICLE
+            VehiclePayments vehiclePayment = new VehiclePayments();
+            vehiclePayment.setBookingId(dto.getBookingId());
+            vehiclePayment.setPaymentId(payment.getPaymentId());
+            vehiclePayment.setVehicleId(Long.valueOf(booking.getVehicleId()));
+            vehiclePayment.setAmount(ec.getVehicleReceives());
+            vehiclePayment.setStatus(payoutStatus);
+            vehiclePayment.setPaymentDateTime(LocalDateTime.now());
+            vehiclePaymentsRepository.save(vehiclePayment);
+
+            // COMPANY
+            CompanyEarn companyEarn = new CompanyEarn();
+            companyEarn.setBookingId(dto.getBookingId());
+            companyEarn.setPaymentId(payment.getPaymentId());
+            companyEarn.setAmount(ec.getPlatformCommission());
+            companyEarn.setPaymentDateTime(LocalDateTime.now());
+            companyEarnRepository.save(companyEarn);
+
+        } else {
+
+            // 🔁 If already exists & fully paid → update status
+
+            if (status.equals("PAID")) {
+
+                existingDriverPayment.setStatus("CONFIRM");
+                existingDriverPayment.setPaymentDateTime(LocalDateTime.now());
+                driverPaymentsRepository.save(existingDriverPayment);
+
+                VehiclePayments vehiclePayment =
+                        (VehiclePayments) vehiclePaymentsRepository
+                                .findByBookingId(dto.getBookingId())
+                                .orElseThrow(() -> new RuntimeException("Vehicle payment not found"));
+
+                vehiclePayment.setStatus("CONFIRM");
+                vehiclePayment.setPaymentDateTime(LocalDateTime.now());
+                vehiclePaymentsRepository.save(vehiclePayment);
+            }
+        }
+
     }
 
 
+    public List<DriverPaymentsResponseDto> getDriverPayments() {
+        return driverPaymentsRepository.getDriverPaymentsWithDetails();
+    }
+
+
+    public List<VehiclePaymentsResponseDto> getVehiclePayments() {
+        return vehiclePaymentsRepository.getVehiclePaymentsWithDetails();
+    }
 }
