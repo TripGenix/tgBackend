@@ -42,6 +42,19 @@ public class Trip {
     @Column(name = "end_location")
     private String endLocation;
 
+    @Column(name = "is_tour_start")
+    private boolean isTourStart;
+
+    @Column(name = "is_tour_end")
+    private boolean isTourEnd;
+
+    @Column(name = "tour_start_date_time")
+    private LocalDateTime tourStartDateTime;
+
+    @Column(name = "tour_end_date_time")
+    private LocalDateTime tourEndDateTime;
+
+
     // 🔐 OTP fields
     private String startOtp;
     private LocalDateTime otpExpiry;

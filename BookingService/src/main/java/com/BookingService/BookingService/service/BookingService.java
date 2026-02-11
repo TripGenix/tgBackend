@@ -826,11 +826,17 @@ public class BookingService {
             BookingSystemResponseDto dto = dtoList.get(i);
 
             dto.setCreatedAt(booking.getDateCreated());
+            dto.setTripId(booking.getTripId());
+
             dto.setRoute(routeRepository.findWayPointsByTripId(booking.getTripId()));
 
             tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
                 dto.setStartDate(trip.getStartDateTime());
                 dto.setEndDate(trip.getEndDateTime());
+                dto.setIsTourStart(trip.isTourStart());
+                dto.setIsTourEnd(trip.isTourEnd());
+
+
             });
         }
         return dtoList;

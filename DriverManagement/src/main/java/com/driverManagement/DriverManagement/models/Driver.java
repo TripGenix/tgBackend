@@ -58,7 +58,7 @@ public class Driver {
     private String licensePdfUrl;
 
     @Column(name = "is_approved")
-    private boolean isApproved;  // tinyint → int or boolean
+    private Integer isApproved;  // tinyint → int or boolean
 
     @Column(name = "status")
     private String status;
