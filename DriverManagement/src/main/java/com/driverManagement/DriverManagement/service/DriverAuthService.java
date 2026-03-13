@@ -52,7 +52,7 @@ public class DriverAuthService {
         driver.setPassword(passwordEncoder.encode(dto.getPassword()));
         driver.setEmailVerified(false);
         driver.setIsDelete(false);
-        driver.setIsApproved(0); // Not approved by admin yet
+        driver.setApproved(false);
         driver.setStatus("PENDING");
         
         // Set default values for required fields that might be null
@@ -107,7 +107,7 @@ public class DriverAuthService {
         response.setFirstName(driver.getFirstName());
         response.setLastName(driver.getLastName());
         response.setEmailVerified(true);
-        response.setIsApproved(driver.getIsApproved());
+        response.setIsApproved(driver.isApproved());
 
         return response;
     }
@@ -143,7 +143,7 @@ public class DriverAuthService {
         response.setFirstName(driver.getFirstName());
         response.setLastName(driver.getLastName());
         response.setEmailVerified(driver.getEmailVerified());
-        response.setIsApproved(driver.getIsApproved());
+        response.setIsApproved(driver.isApproved());
 
         return response;
     }
