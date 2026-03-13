@@ -1,4 +1,4 @@
-package com.driverManagement.DriverManagement.models;
+package com.example.demo.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -58,7 +58,7 @@ public class Driver {
     private String licensePdfUrl;
 
     @Column(name = "is_approved")
-    private boolean isApproved;  // tinyint
+    private boolean isApproved;  // tinyint → int or boolean
 
     @Column(name = "status")
     private String status;
@@ -75,19 +75,4 @@ public class Driver {
 
     @Column(name = "nic_number")
     private String nicNumber;
-
-    @Column(name = "fcm_token", length = 500)
-    private String fcmToken;
-
-    @Column(name = "password", length = 255)
-    private String password;
-
-    @Column(name = "otp", length = 6)
-    private String otp;
-
-    @Column(name = "otp_expiry")
-    private LocalDateTime otpExpiry;
-
-    @Column(name = "email_verified")
-    private Boolean emailVerified = false;
 }
