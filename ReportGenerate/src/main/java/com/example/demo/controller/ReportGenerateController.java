@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.models.Earnings;
+import com.example.demo.services.TourReportService;
 import com.example.demo.services.reportGenerateService;
 
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +18,11 @@ import java.util.Map;
 public class ReportGenerateController {
 
     private final reportGenerateService reportService;
+    private final TourReportService tourReportService;
 
-    public ReportGenerateController(reportGenerateService reportService) {
+    public ReportGenerateController(reportGenerateService reportService, TourReportService tourReportService) {
         this.reportService = reportService;
+        this.tourReportService = tourReportService;
     }
 
     @GetMapping("/earnings")
@@ -46,5 +49,18 @@ public class ReportGenerateController {
         response.put("data", earnings);
 
         return response;
+    }
+
+    @GetMapping("/tours")
+    public List<Map<String, Object>> getTourReports(
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to
+    ) {
+
+        if (from != null && to != null) {
+            return tourReportService.getToursByDate(from, to);
+        }
+
+        return tourReportService.getAllTours();
     }
 }
