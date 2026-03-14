@@ -204,6 +204,7 @@ public class DriverService {
 
         driver.setApproved(true);
         driverRepository.save(driver);
+        System.out.println("Driver approved" +driver);
 
         return ResponseEntity.ok(driver);
     }

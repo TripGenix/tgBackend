@@ -157,6 +157,7 @@ public class BookingService {
         String referenceId = generateReferenceId(savedBooking.getBookingId());
         savedBooking.setReferenceId(referenceId);
 
+
         bookingRepository.save(savedBooking);
 
         // 🔴 NEW: Notify driver if driver is assigned
