@@ -2,6 +2,8 @@ package com.tripgenix.AuthService.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,16 +13,19 @@ import java.time.LocalDateTime;
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "payment_id")
+    private Long paymentId;
 
-    private Double amount;
+    @Column(name="`paid_amount`")
+    private BigDecimal amount;
 
+    @Column(name="`payment_date_time`")
     private LocalDateTime paymentDate;
 
+    @Column(name="`payment_type`")
     private String paymentMethod;
 
-    @ManyToOne
-    @JoinColumn(name = "tourist_id", nullable = false)
-    private Tourist tourist;
+//    @ManyToOne
+//    @JoinColumn(name = "tourist_id", nullable = false)
+//    private Tourist tourist;
 }
-
