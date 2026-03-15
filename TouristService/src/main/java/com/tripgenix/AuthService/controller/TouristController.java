@@ -7,6 +7,7 @@ import com.tripgenix.AuthService.dto.TouristDto;
 import com.tripgenix.AuthService.dto.TouristResponseDto;
 import com.tripgenix.AuthService.model.Tourist;
 import com.tripgenix.AuthService.services.TouristService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -60,4 +61,29 @@ public class TouristController {
 
         return new LoginResposnseDto(token);
     }
+
+    //Get Tourist By Email
+    @GetMapping("/{id}")
+    public ResponseEntity<TouristResponseDto> getTourist(@PathVariable int id){
+        TouristResponseDto tourist=touristService.getTouristById(id);
+        return ResponseEntity.ok(tourist);
+    }
+
+    //Update Tourist
+    @PutMapping("/{id}")
+    public ResponseEntity<TouristResponseDto> updateTourist(
+            @PathVariable int id,
+            @RequestBody TouristDto dto
+    ){
+        TouristResponseDto updated=touristService.updateTourist(id,dto);
+        return ResponseEntity.ok(updated);
+    }
+
+    //Delete Tourist
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteTourist(@PathVariable int id){
+        touristService.deleteTourist(id);
+        return ResponseEntity.ok("Tourist Deleted Successfully");
+    }
+
 }
