@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+
+  admin-service:
+    build: ./AdminManagementService
+    container_name: admin-service
+    ports:
+      - "${ADMIN_PORT:-8086}:8086"
+    env_file:
+      - .env
+
+  booking-service:
+    build: ./BookingService
+    container_name: booking-service
+    ports:
+      - "${BOOKING_PORT:-8087}:8087"
+    env_file:
+      - .env
+
+  driver-service:
+    build: ./DriverManagement
+    container_name: driver-service
+    ports:
+      - "${DRIVER_PORT:-8081}:8081"
+    env_file:
+      - .env
+
+  vehicle-service:
+    build: ./VehicleManagement
+    container_name: vehicle-service
+    ports:
+      - "${VEHICLE_PORT:-8085}:8085"
+    env_file:
+      - .env
+
+  googlemap-service:
+    build: ./GoogleService
+    container_name: googlemap-service
+    ports:
+      - "${GOOGLEMAP_PORT:-8083}:8083"
+    env_file:
+      - .env
+
+  tourist-service:
+    build: ./TouristService
+    container_name: tourist-service
+    ports:
+      - "${TOURIST_PORT:-8082}:8082"
+    env_file:
+      - .env
+
+  package-service:
+    build: ./PackageService
+    container_name: package-service
+    ports:
+      - "${PACKAGE_PORT:-8084}:8084"
+    env_file:
+      - .env
+
+  email-service:
+    build: ./EmailService
+    container_name: email-service
+    ports:
+      - "${EMAIL_PORT:-8088}:8088"
+    env_file:
+      - .env
+
+  hotel-service:
+    build: ./HotelManagement
+    container_name: hotel-service
+    ports:
+      - "${HOTEL_PORT:-8091}:8091"
+    env_file:
+      - .env
+
+  tourguide-service:
+    build: ./Tour_Guide_Service
+    container_name: tourguide-service
+    ports:
+      - "${TOURGUIDE_PORT:-8089}:8089"
+    env_file:
+      - .env
+
+  user-service:
+    build: ./UserService
+    container_name: user-service
+    ports:
+      - "${USER_PORT:-8090}:8090"
+    env_file:
+      - .env
+
+  notification-service:
+    build: ./NotificationService
+    container_name: notification-service
+    ports:
+      - "${NOTIFICATION_PORT:-8092}:8092"
+    env_file:
+      - .env
