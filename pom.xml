@@ -28,6 +28,7 @@
     <module>Tour_Guide_Service</module>
     <module>UserService</module>
     <module>NotificationService</module>
+      <module>ReportGenerate</module>
 
   </modules>
 
