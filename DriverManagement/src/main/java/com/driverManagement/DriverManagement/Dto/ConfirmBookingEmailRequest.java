@@ -1,5 +1,6 @@
 package com.driverManagement.DriverManagement.Dto;
 
+import com.BookingService.BookingService.dto.EmailDetailsDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

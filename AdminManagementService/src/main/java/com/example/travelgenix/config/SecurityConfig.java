@@ -32,7 +32,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/exists").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/users/**").authenticated()
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
 
                         .anyRequest().authenticated()
                 )

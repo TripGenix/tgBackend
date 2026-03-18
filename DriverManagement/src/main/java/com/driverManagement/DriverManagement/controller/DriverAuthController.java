@@ -1,7 +1,7 @@
 package com.driverManagement.DriverManagement.controller;
 
 import com.driverManagement.DriverManagement.Dto.*;
-import com.driverManagement.DriverManagement.services.DriverAuthService;
+import com.driverManagement.DriverManagement.service.DriverAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

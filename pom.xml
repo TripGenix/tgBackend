@@ -20,23 +20,19 @@
     <module>VehicleManagement</module>
     <module>GoogleService</module>
     <module>TouristService</module>
-    <module>AdminManagementService</module>
-    <module>PackageService</module>
-    <module>BookingService</module>
-    <module>EmailService</module>
+      <module>AdminManagementService</module>
+      <module>PackageService</module>
+      <module>BookingService</module>
+
+      <module>EmailService</module>
+
     <module>HotelManagement</module>
-    <module>Tour_Guide_Service</module>
-    <module>UserService</module>
-    <module>NotificationService</module>
+      <module>Tour_Guide_Service</module>
+      <module>UserService</module>
+      <module>NotificationService</module>
+      <module>ReportGenerate</module>
 
   </modules>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <plugin>

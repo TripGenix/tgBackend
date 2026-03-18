@@ -12,7 +12,7 @@ public class EmailServiceClient {
 
     private final WebClient webClient;
     
-    @Value("${email.service.url}")
+    @Value("${email.service.url:http://localhost:8088}")
     private String emailServiceUrl;
 
     public EmailServiceClient(WebClient.Builder webClientBuilder) {
