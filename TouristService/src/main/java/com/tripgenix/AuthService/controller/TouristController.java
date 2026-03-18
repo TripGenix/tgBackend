@@ -7,6 +7,7 @@ import com.tripgenix.AuthService.dto.TouristDto;
 import com.tripgenix.AuthService.dto.TouristResponseDto;
 import com.tripgenix.AuthService.model.Tourist;
 import com.tripgenix.AuthService.services.TouristService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +33,11 @@ public class TouristController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    @GetMapping("/test")
+    public String test() {
+        return "test";
+    }
+
     @PostMapping("/register")
     public ResponseEntity<TouristResponseDto> register(@RequestBody TouristDto dto){
         TouristResponseDto response = touristService.saveTourist(dto);
@@ -48,10 +54,36 @@ public class TouristController {
                 )
         );
 
-        Tourist user = touristService.findByEmail(request.getEmail());
 
+        Tourist user = touristService.findByEmail(request.getEmail());
+        System.out.println(user);
         String token = jwtTokenProvider.generateToken(user);
 
         return new LoginResposnseDto(token);
     }
+
+    //Get Tourist By Email
+    @GetMapping("/{id}")
+    public ResponseEntity<TouristResponseDto> getTourist(@PathVariable int id){
+        TouristResponseDto tourist=touristService.getTouristById(id);
+        return ResponseEntity.ok(tourist);
+    }
+
+    //Update Tourist
+    @PutMapping("/{id}")
+    public ResponseEntity<TouristResponseDto> updateTourist(
+            @PathVariable int id,
+            @RequestBody TouristDto dto
+    ){
+        TouristResponseDto updated=touristService.updateTourist(id,dto);
+        return ResponseEntity.ok(updated);
+    }
+
+    //Delete Tourist
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteTourist(@PathVariable int id){
+        touristService.deleteTourist(id);
+        return ResponseEntity.ok("Tourist Deleted Successfully");
+    }
+
 }

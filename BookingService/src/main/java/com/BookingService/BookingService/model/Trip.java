@@ -19,6 +19,9 @@ public class Trip {
     @Column(name = "trip_id")
     private Long tripId;
 
+    @Column(name = "tourist_id")
+    private Long touristId;
+
     @Column(name = "`start_dateTime`")
     private LocalDateTime startDateTime;
 
@@ -27,6 +30,9 @@ public class Trip {
 
     @Column(name = "`estimated_cost`")
     private BigDecimal estimatedCost;
+
+    @Column(name="`total_cost`")
+    private BigDecimal totalCost;
 
     private String status;
 
@@ -38,4 +44,9 @@ public class Trip {
 
     @Column(name = "end_location")
     private String endLocation;
+
+    // 🔐 OTP fields
+    private String startOtp;
+    private LocalDateTime otpExpiry;
+    private boolean otpVerified=false;
 }

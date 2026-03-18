@@ -80,7 +80,11 @@ public class VehicleService {
         vehicle.setIsDelete(false);
         vehicle.setOwner(owner);
         vehicle.setDocumentUrl(dto.getDocumentUrl());
+        vehicle.setLocation(dto.getLocation());
 
+        vehicle.setLatitude(dto.getLatitude());
+        vehicle.setLongitude(dto.getLongitude());
+        vehicle.setDriverSalaryPerDay(dto.getDriverSalaryPerDay());
         vehicle = vehicleRepository.save(vehicle);
         System.out.println(vehicle);
 
@@ -92,6 +96,7 @@ public class VehicleService {
                 vehicleImageRepository.save(image);
             }
         }
+
 
         return modelMapper.map(vehicle, VehicleDto.class);
     }
@@ -139,22 +144,29 @@ public class VehicleService {
         vehicle.setVehicleName(dto.getVehicleName());
         vehicle.setNumberPlate(dto.getVehicleNumber());
         vehicle.setType(dto.getCategory());
+
         vehicle.setDescription(dto.getDescription());
         vehicle.setPassengerCount(dto.getPassengerCount());
         vehicle.setCostPerKm(BigDecimal.valueOf(dto.getCostPerKm()));
         vehicle.setBookingPrice(BigDecimal.valueOf(dto.getBookingPrice()));
+        vehicle.setDriverSalaryPerDay(dto.getDriverSalaryPerDay());
         vehicle.setStatus(dto.getStatus());
 
         // Update PDF document
         if (dto.getDocumentUrl() != null) {
             vehicle.setDocumentUrl(dto.getDocumentUrl());
         }
+        if (dto.getLatitude() != null) vehicle.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null) vehicle.setLongitude(dto.getLongitude());
+        if (dto.getLocation() != null) vehicle.setLocation(dto.getLocation());
+        if (dto.getLatitude() != null) vehicle.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null) vehicle.setLongitude(dto.getLongitude());
 
         // 4️⃣ Update images (OPTION 2 – delete by vehicleId)
         if (dto.getVehicleImages() != null && !dto.getVehicleImages().isEmpty()) {
 
             // Delete all old images
-            //vehicleImageRepository.deleteByVehicle_VehicleId(vehicle.getVehicleId());
+            vehicleImageRepository.deleteByVehicle_VehicleId(vehicle.getVehicleId());
 
             // Save new images
             for (String url : dto.getVehicleImages()) {
@@ -165,10 +177,8 @@ public class VehicleService {
             }
         }
 
-        // 5️⃣ Save vehicle
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
 
-        // 6️⃣ Return DTO
         return modelMapper.map(updatedVehicle, VehicleDto.class);
     }
 

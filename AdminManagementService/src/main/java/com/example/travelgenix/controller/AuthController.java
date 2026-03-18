@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,11 +29,16 @@ import org.springframework.transaction.annotation.Transactional;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private AuthenticationManager authenticationManager;
-    @Autowired private JwtService jwtService;
-    @Autowired private EmailService emailService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
@@ -64,23 +70,28 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtService.generateToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtService.generateToken(authentication);
 
-        //User user = (User) authentication.getPrincipal();
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found after successful authentication."));
+            //User user = (User) authentication.getPrincipal();
+            User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found after successful authentication."));
 
 
-        AuthResponse response = new AuthResponse(
-                jwt,
-                user.getUsername(),
-                user.getEmail()
-        );
+            AuthResponse response = new AuthResponse(
+                    jwt,
+                    user.getUsername(),
+                    user.getEmail()
+            );
 
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);
+        } catch (DisabledException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Your admin account is inactive. Please contact the system admin.");
+        }
     }
 
 
@@ -150,7 +161,6 @@ public class AuthController {
 
         userRepository.save(user);
 
-        // Return updated user info (no password). You can return AuthResponse if you prefer to include a fresh token.
         AuthResponse resp = new AuthResponse(null, user.getUsername(), user.getEmail());
         return ResponseEntity.ok(resp);
     }
@@ -196,5 +206,87 @@ public class AuthController {
 
         return ResponseEntity.ok("Account deleted successfully.");
     }
+
+
+    @PostMapping("/admin/create-credentials")
+    public ResponseEntity<?> createAdminCredentials(@RequestBody RegisterRequest request) {
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already in use!");
+        }
+
+
+        //create admin
+        User admin = new User();
+        admin.setUsername(request.getUsername());
+        admin.setEmail(request.getEmail());
+        admin.setActive(request.getActive());
+        admin.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        userRepository.save(admin);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Admin credentials created");
+
+    }
+
+    @PutMapping("/admin/update-credentials")
+    public ResponseEntity<?> updateAdminCredentials(@RequestBody AdminUpdateRequest request) {
+
+        String oldEmail = request.getOldEmail() == null ? null : request.getOldEmail().trim();
+        if (oldEmail == null || oldEmail.isBlank()) {
+            return ResponseEntity.badRequest().body("oldEmail is required");
+        }
+
+        User admin = userRepository.findByEmail(oldEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found"));
+
+        // Update username
+        if (request.getUsername() != null && !request.getUsername().trim().isBlank()) {
+            admin.setUsername(request.getUsername().trim());
+        }
+
+        // Update email
+        if (request.getNewEmail() != null && !request.getNewEmail().trim().isBlank()) {
+            String newEmail = request.getNewEmail().trim();
+
+            if (!newEmail.equalsIgnoreCase(admin.getEmail()) && userRepository.existsByEmail(newEmail)) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already in use!");
+            }
+
+            admin.setEmail(newEmail);
+        }
+
+        userRepository.save(admin);
+        return ResponseEntity.ok("Admin credentials updated");
+    }
+
+
+    @DeleteMapping("/admin/delete-credentials")
+    public ResponseEntity<?> deleteAdminCredentials(@RequestParam String email) {
+
+
+        User admin = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found"));
+
+        userRepository.delete(admin);
+        return ResponseEntity.ok("Admin deleted successfully");
+    }
+
+    @PatchMapping("/admin/status")
+    public ResponseEntity<?> patchAdminStatus(@RequestBody AdminStatusRequest req) {
+
+        if (req.getEmail() == null || req.getEmail().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("email is required");
+        }
+
+        User admin = userRepository.findByEmail(req.getEmail().trim())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found"));
+
+        admin.setActive(req.isActive());
+        userRepository.save(admin);
+
+        return ResponseEntity.ok("Admin status updated");
+    }
+
 
 }

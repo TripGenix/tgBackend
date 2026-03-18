@@ -38,7 +38,7 @@ public class DriverResponseDto {
 
     private String licensePdfUrl;
 
-    private int isApproved;
+    private boolean isApproved;
 
     private String status;
 
@@ -49,6 +49,8 @@ public class DriverResponseDto {
     private Boolean isDelete;
 
     private String nicNumber;
+
+    private String fcmToken;
 
     private List<Integer> selectedVehicleCategories;
 

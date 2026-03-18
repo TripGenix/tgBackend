@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -18,7 +19,8 @@ public class VehicleUpdateDto {
     private double costPerKm;
     private double bookingPrice;
     private String status;
-
+    private Double latitude;
+    private Double longitude;
     private String ownerName;
     private String ownerId;
     private String phone;
@@ -31,5 +33,9 @@ public class VehicleUpdateDto {
     private List<String> vehicleImages;
     private String ownerImage;
     private String documentUrl;
+
+    private String location;
+    private BigDecimal driverSalaryPerDay;
+
 }
 

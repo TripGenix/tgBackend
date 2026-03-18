@@ -11,4 +11,5 @@ public class ResourcesDto {
     private VehicleDto vehicle;
     private DriverDto driver;
     private GuideDto guide;
+    private HotelDto hotel;
 }

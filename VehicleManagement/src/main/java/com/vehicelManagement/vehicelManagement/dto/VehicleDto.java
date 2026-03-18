@@ -21,4 +21,8 @@ public class VehicleDto {
     private String status;
     private LocalDateTime createdAt;
     private String vehicleName;
+    private String location;
+    private BigDecimal driver_salary_per_day;
+    private Double latitude;
+    private Double longitude;
 }

@@ -46,6 +46,9 @@ public class Booking {
     @Column(name = "driver_id")
     private Integer driverId;
 
+//    @Column(name = "hotel_id")
+//    private Integer hotelId;
+
     // =========================
     // Booker Details
     // =========================
@@ -132,4 +135,8 @@ public class Booking {
 
     @Column(name = "date_created", nullable = false)
     private LocalDateTime dateCreated;
+
+
+
+
 }

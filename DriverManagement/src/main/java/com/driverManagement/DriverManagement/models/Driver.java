@@ -58,10 +58,10 @@ public class Driver {
     private String licensePdfUrl;
 
     @Column(name = "is_approved")
-    private int isApproved;  // tinyint → int or boolean
+    private boolean isApproved;  // tinyint
 
     @Column(name = "status")
-    private String status;   // if tinyint, change to int
+    private String status;
 
     @Column(name = "driver_image", length = 500)
     private String driverImage;
@@ -75,4 +75,19 @@ public class Driver {
 
     @Column(name = "nic_number")
     private String nicNumber;
+
+    @Column(name = "fcm_token", length = 500)
+    private String fcmToken;
+
+    @Column(name = "password", length = 255)
+    private String password;
+
+    @Column(name = "otp", length = 6)
+    private String otp;
+
+    @Column(name = "otp_expiry")
+    private LocalDateTime otpExpiry;
+
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
 }

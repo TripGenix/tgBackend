@@ -16,8 +16,7 @@ public class TripDetailsDto {
 
     private LocalDate startDate;
     private LocalDate endDate;
-
-    private boolean isVehicle;
+    private Boolean isVehicle;
 
     private List<String> destinations;
 }

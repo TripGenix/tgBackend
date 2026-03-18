@@ -23,7 +23,15 @@
       <module>AdminManagementService</module>
       <module>PackageService</module>
       <module>BookingService</module>
+
       <module>EmailService</module>
+
+    <module>HotelManagement</module>
+      <module>Tour_Guide_Service</module>
+      <module>UserService</module>
+      <module>NotificationService</module>
+      <module>ReportGenerate</module>
+
   </modules>
   <build>
     <plugins>

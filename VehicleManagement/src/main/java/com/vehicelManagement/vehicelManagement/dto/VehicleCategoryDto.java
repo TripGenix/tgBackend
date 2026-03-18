@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VehicleCategoryDto {
-    private int id;
-    private String Category;
-}
+    private Integer id;
+    private String category;}
