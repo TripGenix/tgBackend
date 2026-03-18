@@ -55,10 +55,10 @@ public class Driver {
     private String postalCode;
 
     @Column(name = "licen_pdf_url", length = 500)
-    private String licensePdfUrl;
+    private String  licensePdfUrl;
 
     @Column(name = "is_approved")
-    private Integer isApproved;  // tinyint → int or boolean
+    private boolean isApproved;  // tinyint → int or boolean
 
     @Column(name = "status")
     private String status;
@@ -90,4 +90,6 @@ public class Driver {
 
     @Column(name = "email_verified")
     private Boolean emailVerified = false;
+
+
 }

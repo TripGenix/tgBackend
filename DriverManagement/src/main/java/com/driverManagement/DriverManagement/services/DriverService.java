@@ -202,7 +202,7 @@ public class DriverService {
         Driver driver = driverRepository.findById(driverId)
                 .orElseThrow(() -> new RuntimeException("Driver not found"));
 
-        driver.setIsApproved(1);
+        driver.setApproved(true);
         driverRepository.save(driver);
 
         return ResponseEntity.ok(driver);

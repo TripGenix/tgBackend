@@ -59,7 +59,7 @@ public class TouristController {
         System.out.println(user);
         String token = jwtTokenProvider.generateToken(user);
 
-        return new LoginResposnseDto(token);
+        return new LoginResposnseDto(token, user.getTouristId());
     }
 
     //Get Tourist By Email

@@ -18,7 +18,7 @@ public class Tourist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tourist_id")
-    private Integer touristId;
+    private Long touristId;
 
     @Column(name = "first_name")
     private String firstName;

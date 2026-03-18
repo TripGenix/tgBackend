@@ -19,14 +19,11 @@ public class BusinessModelSercvice {
         this.webClient = webClient;
     }
 
-    @Value("${vehicle.service.url}")
-    private String vehicleServiceUrl;
-
     public EstimatedCostResponse calculateEstimatedCost(
             EstimatedCostRequestDto dto) {
 
         VehicleReciveDto vehicle = webClient.get()
-                .uri(vehicleServiceUrl+"/vehicleController/api/v1/detailsOfVehicle/{id}",
+                .uri("http://localhost:8085/vehicleController/api/v1/detailsOfVehicle/{id}",
                         dto.getVehicleId())
                 .retrieve()
                 .bodyToMono(VehicleReciveDto.class)

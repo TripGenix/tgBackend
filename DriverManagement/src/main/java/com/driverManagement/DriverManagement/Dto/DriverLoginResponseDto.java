@@ -14,6 +14,6 @@ public class DriverLoginResponseDto {
     private String firstName;
     private String lastName;
     private Boolean emailVerified;
-    private int isApproved;
+    private Boolean isApproved;
 }
 

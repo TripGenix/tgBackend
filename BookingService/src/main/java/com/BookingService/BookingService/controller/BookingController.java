@@ -62,6 +62,7 @@ public class BookingController {
             @RequestBody BookingRequestDto dto
     ) {
         BookingResponseDto booking = bookingService.createBooking(dto);
+        System.out.println("Tourist ID going into booking: " + booking.getTouristId());
         return new ResponseEntity<>(booking, HttpStatus.CREATED);
     }
 
@@ -109,6 +110,23 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/get_cancled_bookings")
+    public ResponseEntity<List<BookingSystemResponseDto>> getCancledBookings() {
+        List<BookingSystemResponseDto> bookings = bookingService.getCancledBookings();
+        return ResponseEntity.ok(bookings);
+    }
+
+    @GetMapping("/get_started_bookings")
+    public ResponseEntity<List<BookingSystemResponseDto>> getStartedBookings() {
+        List<BookingSystemResponseDto> bookings = bookingService.getStartedBookings();
+        return ResponseEntity.ok(bookings);
+    }
+
+    @GetMapping("/get_finished_bookings")
+    public ResponseEntity<List<BookingSystemResponseDto>> getFinishedBookings() {
+        List<BookingSystemResponseDto> bookings = bookingService.getFinishedBookings();
+        return ResponseEntity.ok(bookings);
+    }
     @PostMapping("/editBooking/{id}")
     public ResponseEntity<BookingResponseDto> editBooking(
             @PathVariable Long id,

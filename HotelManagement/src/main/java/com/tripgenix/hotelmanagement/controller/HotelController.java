@@ -16,12 +16,12 @@ public class HotelController {
     @Autowired
     private HotelService hotelService;
 
-    @PostMapping("/save")
+    @PostMapping
     public HotelDto saveHotel(@RequestBody HotelDto hotelDto) {
         return hotelService.saveHotel(hotelDto);
     }
 
-    @GetMapping("/getall")
+    @GetMapping
     public List<HotelDto> getAllHotels() {
         return hotelService.getAllHotels();
     }
@@ -31,7 +31,7 @@ public class HotelController {
         return hotelService.getHotelById(id);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable Integer id) {
         return hotelService.deleteHotel(id);
     }
@@ -40,7 +40,7 @@ public class HotelController {
     public HotelDto addReview(@PathVariable Integer id, @RequestBody ReviewDto reviewDto) {
         return hotelService.addReview(id, reviewDto);
     }
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public HotelDto updateHotel(@PathVariable Integer id, @RequestBody HotelDto hotelDto) {
         return hotelService.updateHotel(id, hotelDto);
     }

@@ -14,23 +14,23 @@ public class PackageController {
 
     @Autowired private PackageService packageService;
 
-    @PostMapping("/save")
+    @PostMapping
     public PackageDto createPackage(@RequestBody PackageDto dto) {
         return packageService.savePackage(dto);
     }
 
-    @GetMapping("/getall")
+    @GetMapping
     public List<PackageDto> getAll() {
         return packageService.getAllPackages();
     }
     // --- NEW: UPDATE ENDPOINT ---
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public PackageDto updatePackage(@PathVariable Integer id, @RequestBody PackageDto dto) {
         return packageService.updatePackage(id, dto);
     }
 
     // --- NEW: DELETE ENDPOINT ---
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public String deletePackage(@PathVariable Integer id) {
         return packageService.deletePackage(id);
     }
