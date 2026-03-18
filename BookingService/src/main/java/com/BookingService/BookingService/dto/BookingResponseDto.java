@@ -21,6 +21,4 @@ public class BookingResponseDto {
     private String status;
     private LocalDateTime createdAt;
     private String referenceId;
-    private String driverStatus;
-    private String paymentStatus;
 }

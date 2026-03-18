@@ -40,6 +40,8 @@ public class BookingSystemResponseDto {
 
     // 🔹 Trip route (derived / joined)
     private List<String> route;
+    private Boolean isTourStart;
+    private Boolean isTourEnd;
 
     // 🔹 Tour dates
     private LocalDateTime startDate;

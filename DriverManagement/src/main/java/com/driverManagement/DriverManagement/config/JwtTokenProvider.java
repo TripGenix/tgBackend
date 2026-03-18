@@ -24,7 +24,7 @@ public class JwtTokenProvider {
                 .claim("lastName", driver.getLastName())     // custom claim
                 .claim("role", "DRIVER")                     // custom claim
                 .claim("emailVerified", driver.getEmailVerified())
-                .claim("isApproved", driver.isApproved())
+                .claim("isApproved", driver.getIsApproved())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(SECRET_KEY)
@@ -60,4 +60,3 @@ public class JwtTokenProvider {
                 .getPayload();
     }
 }
-

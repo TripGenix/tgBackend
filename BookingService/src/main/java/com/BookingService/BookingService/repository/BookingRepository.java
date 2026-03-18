@@ -24,8 +24,5 @@ public interface BookingRepository  extends JpaRepository<Booking, Long> {
     List<Booking> findByIsDriverConfirm(boolean b);
 
     Optional<Object> findByReferenceId(String orderId);
-
-    List<Booking> findByTouristId(Long touristId);
-
     List<Booking> findByDriverId(Integer driverId);
 }

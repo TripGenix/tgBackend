@@ -4,9 +4,9 @@ spring.application.name=travelgenix
 server.port=8086
 
 # Database Connection (MySQL)
-spring.datasource.url=jdbc:mysql://localhost:3306/tripgenix_admin_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+spring.datasource.url=jdbc:mysql://localhost:3306/db_tripgenix_tourmangement?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
 spring.datasource.username=root
-spring.datasource.password=1234
+spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true

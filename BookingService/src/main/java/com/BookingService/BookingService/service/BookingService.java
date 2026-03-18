@@ -378,6 +378,8 @@ public class BookingService {
     @Value("${web.app.url}")
     private String webAppUrl;
 
+    @Value("${email.service.url}")
+    private String emailServiceUrl;
     public void sendEmail(Long bookingId) {
 
         BookingSystemResponseById booking = getBookingById(bookingId);
@@ -393,7 +395,7 @@ public class BookingService {
         emailDetails.setSubject("TripGenix Tour Confirmation Email");
 
         webClient.post()
-                .uri("http://localhost:8088/email/api/v1/send")
+                .uri(emailServiceUrl+"/email/api/v1/send")
                 .bodyValue(emailDetails)
                 .retrieve()
                 .bodyToMono(String.class)
@@ -665,7 +667,7 @@ public class BookingService {
 
         // Fetch NEW bookings
         List<Booking> bookings = bookingRepository
-                .findByStatus("DRIVER_CONFIRMED");
+                .findByStatus("CONFIRMED");
 
         //Map entity list → DTO list
         List<BookingSystemResponseDto> dtoList =
@@ -827,11 +829,17 @@ public class BookingService {
             BookingSystemResponseDto dto = dtoList.get(i);
 
             dto.setCreatedAt(booking.getDateCreated());
+            dto.setTripId(booking.getTripId());
+
             dto.setRoute(routeRepository.findWayPointsByTripId(booking.getTripId()));
 
             tripRepository.findById(booking.getTripId()).ifPresent(trip -> {
                 dto.setStartDate(trip.getStartDateTime());
                 dto.setEndDate(trip.getEndDateTime());
+                dto.setIsTourStart(trip.isTourStart());
+                dto.setIsTourEnd(trip.isTourEnd());
+
+
             });
         }
         return dtoList;
@@ -990,5 +998,60 @@ public class BookingService {
         return ResponseEntity.ok(response);
     }
 
+    public DriverStatusResponse getDriverStatus(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Booking not found"));
 
+        Trip trip = tripRepository.findById(booking.getTripId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Trip not found"));
+
+        DriverStatusResponse response = new DriverStatusResponse();
+        response.setBookingId(bookingId);
+        response.setStatus("PENDING");
+        response.setMessage("Driver has not responded yet.");
+
+        if (Boolean.TRUE.equals(booking.getIsDriverConfirm())) {
+            response.setStatus("ACCEPTED");
+            response.setMessage("Driver has accepted the ride.");
+            response.setOtp(trip.getStartOtp());
+
+            if (booking.getDriverId() != null) {
+                try {
+                    DriverDto driver = webClient.get()
+                            .uri("http://localhost:8081/driveController/api/v1/" + booking.getDriverId())
+                            .retrieve()
+                            .bodyToMono(DriverDto.class)
+                            .block();
+                    if (driver != null) {
+                        response.setDriverName(driver.getFirstName() + " " + driver.getLastName());
+                        response.setDriverPhone(driver.getPhone());
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error fetching driver: " + e.getMessage());
+                }
+            }
+
+            if (booking.getVehicleId() != null) {
+                try {
+                    Map<String, Object> vehicle = webClient.get()
+                            .uri("http://localhost:8085/vehicleController/api/v1/detailsOfVehicle/" + booking.getVehicleId())
+                            .retrieve()
+                            .bodyToMono(Map.class)
+                            .block();
+                    if (vehicle != null) {
+                        response.setVehicleNumber((String) vehicle.get("numberPlate"));
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error fetching vehicle: " + e.getMessage());
+                }
+            }
+        } else if (Boolean.TRUE.equals(booking.getIsDriverCancelled())) {
+            response.setStatus("REJECTED");
+            response.setMessage("Driver has rejected the ride.");
+        }
+
+        return response;
+    }
 }

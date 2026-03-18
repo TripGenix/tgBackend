@@ -20,7 +20,7 @@ public class NotificationService {
     @Autowired
     private FCMService fcmService;
 
-    @Value("${driver.service.url:http://localhost:8092}")
+    @Value("${driver.service.url}")
     private String driverServiceUrl;
 
     private WebClient driverServiceClient;

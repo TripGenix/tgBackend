@@ -19,9 +19,6 @@ public class Trip {
     @Column(name = "trip_id")
     private Long tripId;
 
-    @Column(name = "tourist_id")
-    private Long touristId;
-
     @Column(name = "`start_dateTime`")
     private LocalDateTime startDateTime;
 
@@ -44,6 +41,19 @@ public class Trip {
 
     @Column(name = "end_location")
     private String endLocation;
+
+    @Column(name = "is_tour_start")
+    private boolean isTourStart;
+
+    @Column(name = "is_tour_end")
+    private boolean isTourEnd;
+
+    @Column(name = "tour_start_date_time")
+    private LocalDateTime tourStartDateTime;
+
+    @Column(name = "tour_end_date_time")
+    private LocalDateTime tourEndDateTime;
+
 
     // 🔐 OTP fields
     private String startOtp;

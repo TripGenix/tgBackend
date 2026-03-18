@@ -1,7 +1,7 @@
 package com.driverManagement.DriverManagement.services;
 
-import com.BookingService.BookingService.dto.EmailDetailsDto;
-import com.driverManagement.DriverManagement.Config.OtpGenerator;
+import com.driverManagement.DriverManagement.Dto.EmailDetailsDto;
+import com.driverManagement.DriverManagement.config.OtpGenerator;
 import com.driverManagement.DriverManagement.Dto.ConfirmBookingEmailRequest;
 import com.driverManagement.DriverManagement.Dto.TourStatusUpdateDto;
 import com.driverManagement.DriverManagement.models.Booking;
@@ -9,6 +9,7 @@ import com.driverManagement.DriverManagement.models.Trip;
 import com.driverManagement.DriverManagement.repository.TourRepository;
 import com.driverManagement.DriverManagement.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -50,6 +51,8 @@ public class TourService {
         return tourRepo.findByDriverIdAndIsDriverConfirmAndIsDriverCancelled(driverId,false,true);
     }
 
+    @Value("${booking.service.url}")
+    private String bookingServiceUrl;
     public TourStatusUpdateDto confirmTour(int tourId) {
 
         Booking tour = tourRepo.findById(tourId)
@@ -66,14 +69,14 @@ public class TourService {
         }
 
         tour.setIsDriverConfirm(true);
-        tour.setStatus("DRIVER_CONFIRMED");
+        tour.setStatus("CONFIRMED");
         tour.setDriverConfirmedAt(LocalDateTime.now());
 
         try{
             tourRepo.save(tour);
             webClient.post()
                     .uri(
-                            "http://localhost:8087/bookingservice/api/v1/send_confirm_booking_email/{id}",
+                            bookingServiceUrl+"/bookingservice/api/v1/send_confirm_booking_email/{id}",
                             tour.getBookingId()
                     )
                     .retrieve()

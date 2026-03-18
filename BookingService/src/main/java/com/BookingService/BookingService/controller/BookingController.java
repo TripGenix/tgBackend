@@ -1,11 +1,8 @@
 package com.BookingService.BookingService.controller;
 
-import com.BookingService.BookingService.dto.ActionResponse;
-import com.BookingService.BookingService.dto.BookingRequestDto;
-import com.BookingService.BookingService.dto.BookingResponseDto;
+import com.BookingService.BookingService.dto.*;
 import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostRequestDto;
 import com.BookingService.BookingService.dto.BusinessModel.EstimatedCostResponse;
-import com.BookingService.BookingService.dto.ConfirmBookingEmailRequest;
 import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseById;
 import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseDto;
 import com.BookingService.BookingService.service.BookingService;
@@ -16,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+import com.BookingService.BookingService.dto.systemReponse.BookingSystemResponseDto;
 @RestController
 @RequestMapping("bookingservice/api/v1")
 @CrossOrigin("*")
@@ -112,24 +109,6 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/get_cancled_bookings")
-    public ResponseEntity<List<BookingSystemResponseDto>> getCancledBookings() {
-        List<BookingSystemResponseDto> bookings = bookingService.getCancledBookings();
-        return ResponseEntity.ok(bookings);
-    }
-
-    @GetMapping("/get_started_bookings")
-    public ResponseEntity<List<BookingSystemResponseDto>> getStartedBookings() {
-        List<BookingSystemResponseDto> bookings = bookingService.getStartedBookings();
-        return ResponseEntity.ok(bookings);
-    }
-
-    @GetMapping("/get_finished_bookings")
-    public ResponseEntity<List<BookingSystemResponseDto>> getFinishedBookings() {
-        List<BookingSystemResponseDto> bookings = bookingService.getFinishedBookings();
-        return ResponseEntity.ok(bookings);
-    }
-
     @PostMapping("/editBooking/{id}")
     public ResponseEntity<BookingResponseDto> editBooking(
             @PathVariable Long id,
@@ -156,6 +135,11 @@ public class BookingController {
     @PostMapping("/confirm-by-admin/{bookingId}")
     public ResponseEntity<ActionResponse> confirmByTripgenix(@PathVariable Long bookingId) {
         return bookingService.confirmByAdmin(bookingId);
+    }
+    @GetMapping("/get_driver_status/{bookingId}")
+    public ResponseEntity<DriverStatusResponse> getDriverStatus(@PathVariable Long bookingId) {
+        DriverStatusResponse response = bookingService.getDriverStatus(bookingId);
+        return ResponseEntity.ok(response);
     }
 
 }
