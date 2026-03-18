@@ -1,4 +1,4 @@
-package com.driverManagement.DriverManagement.Config;
+package com.driverManagement.DriverManagement.config;
 
 import org.springframework.stereotype.Component;
 
