@@ -7,26 +7,37 @@ import jakarta.persistence.*;
 public class TourGuide {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tour_guide_id")
     private Long tourGuideId;
 
-    private String language;
-    private int reviewId;
-    private String image;
-
-    @Column(name = "tour_guide_name")
+    @Column(name = "tour_guide_name", nullable = false)
     private String name;
 
-    private boolean status;
+    @Column(nullable = false, unique = true)
     private String nic;
-    private Integer driver;
-    private Double hourlyRate;
+
+    @Column(length = 1000)
+    private String description;
+
+    @Column(name = "price_per_day")
+    private Double pricePerDay;
+
+    @Column(name = "contact_number")
+    private String contactNumber;
+
+    private String image;
+
+    @Column(name = "experience_years")
+    private Integer experienceYears;
+
+    // You can store multiple languages as comma-separated values
+    private String languages;
 
     public TourGuide() {
     }
 
-    // getters & setters
+    // Getters & Setters
 
     public Long getTourGuideId() {
         return tourGuideId;
@@ -34,30 +45,6 @@ public class TourGuide {
 
     public void setTourGuideId(Long tourGuideId) {
         this.tourGuideId = tourGuideId;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public int getReviewId() {
-        return reviewId;
-    }
-
-    public void setReviewId(int reviewId) {
-        this.reviewId = reviewId;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public String getName() {
@@ -68,14 +55,6 @@ public class TourGuide {
         this.name = name;
     }
 
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
     public String getNic() {
         return nic;
     }
@@ -84,19 +63,51 @@ public class TourGuide {
         this.nic = nic;
     }
 
-    public Integer getDriver() {
-        return driver;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDriver(Integer driver) {
-        this.driver = driver;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public Double getHourlyRate() {
-        return hourlyRate;
+    public Double getPricePerDay() {
+        return pricePerDay;
     }
 
-    public void setHourlyRate(Double hourlyRate) {
-        this.hourlyRate = hourlyRate;
+    public void setPricePerDay(Double pricePerDay) {
+        this.pricePerDay = pricePerDay;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Integer getExperienceYears() {
+        return experienceYears;
+    }
+
+    public void setExperienceYears(Integer experienceYears) {
+        this.experienceYears = experienceYears;
+    }
+
+    public String getLanguages() {
+        return languages;
+    }
+
+    public void setLanguages(String languages) {
+        this.languages = languages;
     }
 }
