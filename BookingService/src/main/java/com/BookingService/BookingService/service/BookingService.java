@@ -1058,7 +1058,7 @@ public class BookingService {
             if (booking.getDriverId() != null) {
                 try {
                     DriverDto driver = webClient.get()
-                            .uri("http://localhost:8081/driveController/api/v1/" + booking.getDriverId())
+                            .uri("http://13.218.211.254:8081/driveController/api/v1/" + booking.getDriverId())
                             .retrieve()
                             .bodyToMono(DriverDto.class)
                             .block();
@@ -1074,7 +1074,7 @@ public class BookingService {
             if (booking.getVehicleId() != null) {
                 try {
                     Map<String, Object> vehicle = webClient.get()
-                            .uri("http://localhost:8085/vehicleController/api/v1/detailsOfVehicle/" + booking.getVehicleId())
+                            .uri("http://13.218.211.254:8085/vehicleController/api/v1/detailsOfVehicle/" + booking.getVehicleId())
                             .retrieve()
                             .bodyToMono(Map.class)
                             .block();

@@ -23,7 +23,7 @@ public class BusinessModelSercvice {
             EstimatedCostRequestDto dto) {
 
         VehicleReciveDto vehicle = webClient.get()
-                .uri("http://localhost:8085/vehicleController/api/v1/detailsOfVehicle/{id}",
+                .uri("http://13.218.211.254/:8085/vehicleController/api/v1/detailsOfVehicle/{id}",
                         dto.getVehicleId())
                 .retrieve()
                 .bodyToMono(VehicleReciveDto.class)

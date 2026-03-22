@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
     
-    @Value("${notification.service.url:http://localhost:8089}")
+    @Value("${notification.service.url:http://13.218.211.254:8089}")
     private String notificationServiceUrl;
     
     @Bean
