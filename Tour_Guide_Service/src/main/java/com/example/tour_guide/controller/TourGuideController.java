@@ -19,60 +19,48 @@ public class TourGuideController {
         this.service = service;
     }
 
+    // ✅ CREATE (same endpoint)
     @PostMapping("/create-tour-guide")
     public ResponseEntity<String> create(@RequestBody TourGuideDTO dto) {
-        try {
-            String result = service.createGuide(dto);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error creating guide: " + e.getMessage());
-        }
+        String result = service.createGuide(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
+    // ✅ GET ALL (same endpoint)
     @GetMapping("/getAll")
     public ResponseEntity<List<TourGuideDTO>> getAll() {
-        try {
-            List<TourGuideDTO> guides = service.getAllTourGuides();
-            return ResponseEntity.ok(guides);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return ResponseEntity.ok(service.getAllTourGuides());
     }
 
-    @GetMapping(path="/search", params="tourId")
+    // ✅ SEARCH (same endpoint)
+    @GetMapping(path = "/search", params = "tourId")
     public ResponseEntity<TourGuideDTO> search(@RequestParam Long tourId) {
-        try {
-            TourGuideDTO guide = service.searchGuide(tourId);
-            if (guide == null) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.ok(guide);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+        TourGuideDTO guide = service.searchGuide(tourId);
+
+        if (guide == null) {
+            return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.ok(guide);
     }
 
+    // ✅ UPDATE (same endpoint)
     @PutMapping("/update-tour-guide")
     public ResponseEntity<String> update(@RequestBody TourGuideDTO dto) {
-        try {
-            String result = service.updateGuide(dto);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error updating guide: " + e.getMessage());
+
+        if (dto.getTourGuideId() == null) {
+            return ResponseEntity.badRequest().body("TourGuideId is required");
         }
+
+        String result = service.updateGuide(dto);
+        return ResponseEntity.ok(result);
     }
 
-
+    // ✅ DELETE (same endpoint)
     @DeleteMapping("/delete/{tourId}")
     public ResponseEntity<String> delete(@PathVariable Long tourId) {
-        try {
-            service.deleteGuide(tourId);
-            return ResponseEntity.ok("Guide deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error deleting guide: " + e.getMessage());
-        }
+        service.deleteGuide(tourId);
+        return ResponseEntity.ok("Guide deleted successfully");
     }
 }

@@ -160,4 +160,10 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/final-payment/{bookingId}")
+    public void FinalPayment(@PathVariable Long bookingId) {
+         System.out.println(bookingId);
+        bookingService.sendFinalPaymentEmail(bookingId);
+    }
+
 }

@@ -3,63 +3,41 @@ package com.example.tour_guide.dto.req;
 public class TourGuideDTO {
 
     private Long tourGuideId;
-    private String language;
-    private int reviewId;
-    private String image;
     private String name;
-    private boolean status;
     private String nic;
-    private Integer driver;
-    private Double hourlyRate;
+    private String description;
+    private Double pricePerDay;
+    private String contactNumber;
+    private String image;
+    private Integer experienceYears;
+    private String languages;
 
     public TourGuideDTO() {
     }
 
-    public TourGuideDTO(Long tourGuideId, String language, int reviewId,
-            String image, String name, boolean status,
-            String nic, Integer driver, Double hourlyRate) {
+    public TourGuideDTO(Long tourGuideId, String name, String nic,
+                        String description, Double pricePerDay,
+                        String contactNumber, String image,
+                        Integer experienceYears, String languages) {
         this.tourGuideId = tourGuideId;
-        this.language = language;
-        this.reviewId = reviewId;
-        this.image = image;
         this.name = name;
-        this.status = status;
         this.nic = nic;
-        this.driver = driver;
-        this.hourlyRate = hourlyRate;
+        this.description = description;
+        this.pricePerDay = pricePerDay;
+        this.contactNumber = contactNumber;
+        this.image = image;
+        this.experienceYears = experienceYears;
+        this.languages = languages;
     }
 
-    // getters & setters
+    // Getters & Setters
+
     public Long getTourGuideId() {
         return tourGuideId;
     }
 
     public void setTourGuideId(Long tourGuideId) {
         this.tourGuideId = tourGuideId;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public int getReviewId() {
-        return reviewId;
-    }
-
-    public void setReviewId(int reviewId) {
-        this.reviewId = reviewId;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public String getName() {
@@ -70,14 +48,6 @@ public class TourGuideDTO {
         this.name = name;
     }
 
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
     public String getNic() {
         return nic;
     }
@@ -86,19 +56,51 @@ public class TourGuideDTO {
         this.nic = nic;
     }
 
-    public Integer getDriver() {
-        return driver;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDriver(Integer driver) {
-        this.driver = driver;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public Double getHourlyRate() {
-        return hourlyRate;
+    public Double getPricePerDay() {
+        return pricePerDay;
     }
 
-    public void setHourlyRate(Double hourlyRate) {
-        this.hourlyRate = hourlyRate;
+    public void setPricePerDay(Double pricePerDay) {
+        this.pricePerDay = pricePerDay;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Integer getExperienceYears() {
+        return experienceYears;
+    }
+
+    public void setExperienceYears(Integer experienceYears) {
+        this.experienceYears = experienceYears;
+    }
+
+    public String getLanguages() {
+        return languages;
+    }
+
+    public void setLanguages(String languages) {
+        this.languages = languages;
     }
 }

@@ -1,5 +1,6 @@
 package com.BookingService.BookingService.service;
 import com.BookingService.BookingService.EmailTemplates.EmailTemplateBuilder;
+import com.BookingService.BookingService.EmailTemplates.EmailTotalCostPay;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -412,6 +413,43 @@ public class BookingService {
                 .subscribe();
 
 
+    }
+
+    public void sendFinalPaymentEmail(Long bookingId) {
+
+        BookingSystemResponseById booking = getBookingById(bookingId);
+        EmailTotalCostPay emailTemplate = new EmailTotalCostPay();
+
+        EmailDetailsDto emailDetails = new EmailDetailsDto();
+
+        // Only payment URL needed
+        String paymentUrl = webAppUrl + "/final-payment/" + bookingId;
+
+        emailDetails.setMsgBody(
+                emailTemplate.buildTotalPaymentEmail(booking, paymentUrl)
+        );
+
+        emailDetails.setRecipient(
+                booking.getBookingDetails().getBookerEmail()
+        );
+
+        emailDetails.setSubject("TripGenix - Complete Your Final Payment");
+        webClient.post()
+                .uri(emailServiceUrl + "/email/api/v1/send")
+                .bodyValue(emailDetails)
+                .retrieve()
+                .bodyToMono(String.class)
+                .doOnSuccess(response -> {
+                    System.out.println("✅ Final Payment Email sent: " + response);
+
+                    updateEmailStatus(bookingId, true);
+                })
+                .doOnError(error -> {
+                    System.err.println("❌ Final Payment Email failed: " + error.getMessage());
+
+                    updateEmailStatus(bookingId, false);
+                })
+                .subscribe();
     }
 
     @Transactional

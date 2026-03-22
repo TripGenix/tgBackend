@@ -181,8 +181,9 @@ public class TourService {
         tripRepo.save(trip);
     }
 
-    public void finishTour(int tourId) {
-        Booking tour = tourRepo.findById(tourId)
+    public void finishTour(int bookingId) {
+
+        Booking tour = tourRepo.findById(bookingId)
                 .orElseThrow(() ->
                         new RuntimeException("Tour not found")
                 );
@@ -191,11 +192,41 @@ public class TourService {
                 Math.toIntExact(tour.getTripId())
         );
 
+        if (trip == null) {
+            throw new RuntimeException("Trip not found");
+        }
+
+        // Update values
         trip.setTourEnd(true);
-        tour.setStatus("FINISHED");
         trip.setTourEndDateTime(LocalDateTime.now());
         trip.setOtpVerified(true);
 
-        tripRepo.save(trip);
+        tour.setStatus("FINISHED");
+
+        try {
+
+            // Save DB changes
+            tourRepo.save(tour);
+            tripRepo.save(trip);
+
+            // Call Booking Service (FINAL PAYMENT EMAIL)
+            webClient.post()
+                    .uri(
+                            bookingServiceUrl + "/bookingservice/api/v1/final-payment/{bookingId}",
+                            bookingId
+                    )
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .doOnSuccess(res ->
+                            System.out.println("✅ Final payment email triggered")
+                    )
+                    .doOnError(err ->
+                            System.err.println("❌ Failed to trigger email: " + err.getMessage())
+                    )
+                    .subscribe();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to finish tour", e);
+        }
     }
 }
